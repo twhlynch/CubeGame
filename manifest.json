@@ -1,0 +1,17 @@
+{
+	"RNApplication": "AR-Test",
+	"RNSearchPaths":
+	[
+		"./Resources"
+	],
+	"RNModules":
+	[
+		"Modules/RayneMetal",
+		"Modules/RayneVulkan",
+		"Modules/RayneOpenXR"
+	],
+	"RNPreferredTextureFileExtension~macos": "dds",
+	"RNPreferredTextureFileExtension~windows": "dds",
+	"RNPreferredTextureFileExtension~linux": "dds",
+	"RNPreferredTextureFileExtension~android": "astc"
+}

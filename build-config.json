@@ -1,0 +1,33 @@
+{
+	"bundle-id": "com.index.ar-test",
+	"name": "AR-Test",
+	"build-directory": "Builds",
+	"release-directory": "Releases",
+	"cmake-build-type": "Release",
+	"cmake-parameters": "",
+	"cmake-targets~android":
+	[
+		"Rayne",
+		"RayneJolt",
+		"RayneVulkan",
+		"RayneUI",
+		"RayneFlexUI",
+		"RayneVR",
+		"RayneOpenXR",
+		"zlibstatic",
+		"zip",
+		"jansson",
+		"png_static",
+		"AR-Test"
+	],
+	"permissions~android":
+	[
+		
+	],
+	"keystore~android": "../../AndroidReleaseKeyStore",
+	"build-secrets": "Other/build-secrets.json",
+	"dependencies":
+	{
+		
+	}
+}
