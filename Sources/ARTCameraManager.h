@@ -1,10 +1,3 @@
-//
-//  ARTCameraManager.h
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #ifndef __ART_CAMERAMANAGER_H_
 #define __ART_CAMERAMANAGER_H_
 

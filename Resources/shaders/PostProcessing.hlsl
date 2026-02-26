@@ -1,10 +1,3 @@
-//
-//  PostProcessing.hlsl
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 SamplerState linearRepeatSampler;
 Texture2DArray framebufferTexture;
 

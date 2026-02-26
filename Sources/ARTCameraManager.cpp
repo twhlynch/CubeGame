@@ -1,10 +1,3 @@
-//
-//  ARTCameraManager.cpp
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #include "ARTCameraManager.h"
 
 #include "ARTWorld.h"

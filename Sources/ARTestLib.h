@@ -1,10 +1,3 @@
-//
-//  ARTestLib.h
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #pragma once
 
 #if RN_PLATFORM_IOS || RN_PLATFORM_VISIONOS

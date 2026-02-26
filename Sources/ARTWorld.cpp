@@ -1,10 +1,3 @@
-//
-//  ARTWorld.cpp
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #include "ARTWorld.h"
 
 #include <Rendering/RNMaterial.h>

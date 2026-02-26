@@ -1,10 +1,3 @@
-//
-//  main-apple.swift
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 import SwiftUI
 import MetalKit
 import ARTestLib

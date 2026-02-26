@@ -1,10 +1,3 @@
-//
-//  ARTApplication.h
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #ifndef __ART_APPLICATION_H_
 #define __ART_APPLICATION_H_
 

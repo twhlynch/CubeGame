@@ -1,10 +1,3 @@
-//
-//  Sky.hlsl
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 cbuffer vertexUniforms
 {
 #if RN_USE_MULTIVIEW

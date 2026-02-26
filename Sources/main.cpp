@@ -1,10 +1,3 @@
-//
-//  main.cpp
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #include <Rayne.h>
 
 #include "ARTestLib.h"

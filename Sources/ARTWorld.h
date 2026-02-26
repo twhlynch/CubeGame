@@ -1,10 +1,3 @@
-//
-//  ARTWorld.h
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #ifndef __ART_WORLD_H_
 #define __ART_WORLD_H_
 

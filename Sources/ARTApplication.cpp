@@ -1,10 +1,3 @@
-//
-//  ARTApplication.cpp
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #include "ARTApplication.h"
 
 #include "ARTWorld.h"

@@ -1,10 +1,3 @@
-//
-//  Base.hlsl
-//  ARTest
-//
-//  Copyright 2026 by index. All rights reserved.
-//
-
 #ifndef RN_UV0
 #define RN_UV0 0
 #endif
