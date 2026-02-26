@@ -2,6 +2,7 @@
 
 #include <Rendering/RNMaterial.h>
 
+#include "ARTHand.h"
 #include "ARTTypes.h"
 
 namespace ART
@@ -180,6 +181,11 @@ void World::LoadLevel()
 	auto *cubeBody = RN::JoltStaticBody::WithShape(cubeShape);
 	cubeBody->SetCollisionFilter(Types::CollisionLevel, Types::CollisionAll);
 	cubeEntity->AddAttachment(cubeBody);
+
+	auto *leftHand = new Hand(0);
+	auto *rightHand = new Hand(1);
+	AddLevelNode(leftHand->Autorelease());
+	AddLevelNode(rightHand->Autorelease());
 
 	if (!RN::Renderer::IsHeadless())
 	{

@@ -85,6 +85,7 @@ set(
 	Sources/ARTApplication.cpp
 	Sources/ARTCameraManager.cpp
 	Sources/ARTWorld.cpp
+	Sources/ARTHand.cpp
 )
 
 set(
@@ -93,6 +94,7 @@ set(
 	Sources/ARTCameraManager.h
 	Sources/ARTWorld.h
 	Sources/ARTestLib.h
+	Sources/ARTHand.h
 )
 
 set(RESOURCES manifest.json Resources)

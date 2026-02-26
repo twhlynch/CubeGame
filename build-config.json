@@ -24,6 +24,14 @@
 			"type": "feature",
 			"name": "com.oculus.feature.PASSTHROUGH",
 			"required": true
+		},
+		{
+			"type": "permission",
+			"name": "com.oculus.permission.HAND_TRACKING"
+		},
+		{
+			"type": "feature",
+			"name": "oculus.software.handtracking"
 		}
 	],
 	"keystore~android": "../../AndroidReleaseKeyStore",
