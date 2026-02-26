@@ -191,10 +191,13 @@ void World::LoadLevel()
 
 		RN::Shader::Options *skyShaderOptions = RN::Shader::Options::WithMesh(skyModel->GetLODStage(0)->GetMeshAtIndex(0));
 		skyShaderOptions->AddDefine(RNCSTR("RN_SKY"), RNCSTR("1"));
-		skyMaterial->SetVertexShader(RN::Renderer::GetActiveRenderer()->GetDefaultShader(RN::Shader::Type::Vertex, skyShaderOptions, RN::Shader::UsageHint::Default));
-		skyMaterial->SetFragmentShader(RN::Renderer::GetActiveRenderer()->GetDefaultShader(RN::Shader::Type::Fragment, skyShaderOptions, RN::Shader::UsageHint::Default));
+		skyMaterial->SetVertexShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_vertex"), skyShaderOptions));
+		skyMaterial->SetFragmentShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_fragment"), skyShaderOptions));
 		skyMaterial->SetVertexShader(RN::Renderer::GetActiveRenderer()->GetDefaultShader(RN::Shader::Type::Vertex, skyShaderOptions, RN::Shader::UsageHint::Depth), RN::Shader::UsageHint::Depth);
 		skyMaterial->SetFragmentShader(RN::Renderer::GetActiveRenderer()->GetDefaultShader(RN::Shader::Type::Fragment, skyShaderOptions, RN::Shader::UsageHint::Depth), RN::Shader::UsageHint::Depth);
+		skyShaderOptions->EnableMultiview();
+		skyMaterial->SetVertexShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_vertex"), skyShaderOptions), RN::Shader::UsageHint::Multiview);
+		skyMaterial->SetFragmentShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_fragment"), skyShaderOptions), RN::Shader::UsageHint::Multiview);
 		skyModel->GetLODStage(0)->ReplaceMaterial(skyMaterial, 0);
 
 		RN::Entity *skyEntity = new RN::Entity(skyModel);

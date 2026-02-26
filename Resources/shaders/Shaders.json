@@ -20,7 +20,26 @@
 			}
 		]
 	},
-
+	{
+		"file": "Sky.hlsl",
+		"shaders": [
+			{
+				"name": "sky_vertex",
+				"type": "vertex",
+				"signature": {
+					"options": ["RN_COLOR", "RN_UV0", "RN_USE_MULTIVIEW"]
+				}
+			},
+			{
+				"name": "sky_fragment",
+				"type": "fragment",
+				"signature": {
+					"samplers": [{ "name": "linearClampSampler", "wrap": "clamp" }],
+					"options": ["RN_COLOR", "RN_UV0"]
+				}
+			}
+		]
+	},
 	{
 		"file": "PostProcessing.hlsl",
 		"shaders": [
