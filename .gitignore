@@ -1,5 +1,25 @@
+# editor configs
+/.vscode
+/.zed
+/.nvim.lua
+
+# OS specific
 .DS_Store
+*:Zone.Identifier
+
+# clang cache
+/.cache
+
+# lsp config
+/build/compile_commands.json
+/buildServer.json
+
+# blender
 *.blend1
-Other/build-secrets.json
-Builds
-Releases
+
+# build output
+/Builds
+/Releases
+
+# secrets
+/Other/build-secrets.json

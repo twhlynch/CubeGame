@@ -1,0 +1,3 @@
+CompileFlags:
+  CompilationDatabase: build
+  Remove: [-ivfsstatcache, -index-store-path, -index-unit-output-path]

@@ -1,0 +1,3 @@
+indent: tabs
+line_length: 80
+list_expansion: favour-inlining
