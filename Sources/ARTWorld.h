@@ -1,11 +1,10 @@
-#ifndef __ART_WORLD_H_
-#define __ART_WORLD_H_
+#pragma once
 
+#include <RNJoltWorld.h>
 #include <Rayne.h>
 
 #include "ARTCameraManager.h"
 #include "ARTTypes.h"
-#include "RNJoltWorld.h"
 
 namespace ART
 {
@@ -16,7 +15,7 @@ public:
 	static void Exit();
 
 	World(RN::VRWindow *vrWindow);
-	~World();
+	~World() override;
 
 	RN::JoltWorld *GetPhysicsWorld() const { return _physicsWorld; }
 	RN::ShaderLibrary *GetShaderLibrary() const { return _shaderLibrary; }
@@ -58,5 +57,3 @@ protected:
 	static World *_sharedInstance;
 };
 } // namespace ART
-
-#endif /* __ART_WORLD_H_ */

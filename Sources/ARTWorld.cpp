@@ -2,6 +2,8 @@
 
 #include <Rendering/RNMaterial.h>
 
+#include "ARTTypes.h"
+
 namespace ART
 {
 World *World::_sharedInstance = nullptr;
@@ -112,7 +114,7 @@ RN::Model *World::AssignShader(RN::Model *model, Types::MaterialType materialTyp
 
 		switch (materialType)
 		{
-			case Types::MaterialDefault:
+			case Types::MaterialType::MaterialDefault:
 				{
 					material->SetDepthWriteEnabled(true);
 					material->SetDepthMode(RN::DepthMode::GreaterOrEqual);
@@ -168,25 +170,25 @@ void World::LoadLevel()
 {
 	RemoveAllLevelNodes();
 
-	RN::Model *cubeModel = AssignShader(RN::Model::WithCube(RN::Color::Red()), Types::MaterialDefault);
-	RN::Entity *cubeEntity = new RN::Entity(cubeModel);
+	RN::Model *cubeModel = AssignShader(RN::Model::WithCube(RN::Color::Red()), Types::MaterialType::MaterialDefault);
+	auto *cubeEntity = new RN::Entity(cubeModel);
 	cubeEntity->SetScale(0.1f);
 	AddLevelNode(cubeEntity->Autorelease());
 
-	RN::JoltMaterial *cubePhysicsMaterial = new RN::JoltMaterial();
-	RN::JoltCompoundShape *cubeShape = RN::JoltCompoundShape::WithModel(cubeModel, cubePhysicsMaterial->Autorelease(), RN::Vector3(1.0f, 1.0f, 1.0f), true);
-	RN::JoltStaticBody *cubeBody = RN::JoltStaticBody::WithShape(cubeShape);
+	auto *cubePhysicsMaterial = new RN::JoltMaterial();
+	auto *cubeShape = RN::JoltCompoundShape::WithModel(cubeModel, cubePhysicsMaterial->Autorelease(), RN::Vector3(1.0f, 1.0f, 1.0f), true);
+	auto *cubeBody = RN::JoltStaticBody::WithShape(cubeShape);
 	cubeBody->SetCollisionFilter(Types::CollisionLevel, Types::CollisionAll);
 	cubeEntity->AddAttachment(cubeBody);
 
 	if (!RN::Renderer::IsHeadless())
 	{
-		RN::Mesh *skyMesh = RN::Mesh::WithColoredCube(100, RN::Color::White());
-		RN::Material *skyMaterial = RN::Material::WithShaders(nullptr, nullptr);
+		auto *skyMesh = RN::Mesh::WithColoredCube(100, RN::Color::White());
+		auto *skyMaterial = RN::Material::WithShaders(nullptr, nullptr);
 		skyMaterial->SetDepthMode(RN::DepthMode::GreaterOrEqual);
 		skyMaterial->SetCullMode(RN::CullMode::None);
 
-		RN::Shader::Options *skyShaderOptions = RN::Shader::Options::WithMesh(skyMesh);
+		auto *skyShaderOptions = RN::Shader::Options::WithMesh(skyMesh);
 		skyShaderOptions->AddDefine(RNCSTR("RN_SKY"), RNCSTR("1"));
 		skyMaterial->SetVertexShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_vertex"), skyShaderOptions));
 		skyMaterial->SetFragmentShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_fragment"), skyShaderOptions));
@@ -196,8 +198,8 @@ void World::LoadLevel()
 		skyMaterial->SetVertexShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_vertex"), skyShaderOptions), RN::Shader::UsageHint::Multiview);
 		skyMaterial->SetFragmentShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("sky_fragment"), skyShaderOptions), RN::Shader::UsageHint::Multiview);
 
-		RN::Model *skyModel = new RN::Model(skyMesh, skyMaterial);
-		RN::Entity *skyEntity = new RN::Entity(skyModel->Autorelease());
+		auto *skyModel = new RN::Model(skyMesh, skyMaterial);
+		auto *skyEntity = new RN::Entity(skyModel->Autorelease());
 		skyEntity->SetScale(RN::Vector3(10.0f));
 		skyEntity->SetRenderPriority(RN::SceneNode::RenderPriority::RenderSky);
 		AddLevelNode(skyEntity->Autorelease());

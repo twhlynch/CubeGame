@@ -1,9 +1,7 @@
-#ifndef __ART_CAMERAMANAGER_H_
-#define __ART_CAMERAMANAGER_H_
+#pragma once
 
+#include <RNVRCamera.h>
 #include <Rayne.h>
-
-#include "RNVRCamera.h"
 
 namespace ART
 {
@@ -21,11 +19,11 @@ public:
 	void ResetPositionAndRotationDelayed();
 
 	void SetCameraAmbientColor(const RN::Color &targetColor, float changeRate, std::function<void(void)> completed);
-	RN::SceneNode *GetHeadSceneNode() const;
+	[[nodiscard]] RN::SceneNode *GetHeadSceneNode() const;
 
-	RN::VRCamera *GetVRCamera() const { return _vrCamera; }
-	RN::Camera *GetHeadCamera() const { return _headCamera; }
-	RN::Camera *GetPreviewCamera() const { return _previewCamera; }
+	[[nodiscard]] RN::VRCamera *GetVRCamera() const { return _vrCamera; }
+	[[nodiscard]] RN::Camera *GetHeadCamera() const { return _headCamera; }
+	[[nodiscard]] RN::Camera *GetPreviewCamera() const { return _previewCamera; }
 
 protected:
 	void UpdateForWindowSize() const;
@@ -64,5 +62,3 @@ protected:
 	RN::VRCompositorLayer *_passthroughLayer;
 };
 } // namespace ART
-
-#endif /* __ART_CAMERAMANAGER_H_ */

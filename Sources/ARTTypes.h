@@ -1,11 +1,8 @@
-#ifndef __ART_TYPES_H_
-#define __ART_TYPES_H_
+#pragma once
 
-#include "Rayne.h"
+#include <Rayne.h>
 
-namespace ART
-{
-namespace Types
+namespace ART::Types
 {
 enum CollisionType
 {
@@ -14,11 +11,8 @@ enum CollisionType
 	CollisionAll = 0xffffffff
 };
 
-enum MaterialType
+enum class MaterialType : uint8_t
 {
 	MaterialDefault
 };
-} // namespace Types
-} // namespace ART
-
-#endif /* defined(__ART_TYPES_H_) */
+} // namespace ART::Types

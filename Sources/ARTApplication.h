@@ -1,9 +1,7 @@
-#ifndef __ART_APPLICATION_H_
-#define __ART_APPLICATION_H_
+#pragma once
 
+#include <RNVRApplication.h>
 #include <Rayne.h>
-
-#include "RNVRApplication.h"
 
 namespace ART
 {
@@ -11,11 +9,9 @@ class Application : public RN::VRApplication
 {
 public:
 	Application();
-	~Application();
+	~Application() override;
 
 	void WillFinishLaunching(RN::Kernel *kernel) override;
 	void DidFinishLaunching(RN::Kernel *kernel) override;
 };
 } // namespace ART
-
-#endif /* __ART_APPLICATION_H_ */

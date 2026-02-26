@@ -1,7 +1,8 @@
 #include "ARTApplication.h"
 
+#include <RNVRApplicationImpl.h>
+
 #include "ARTWorld.h"
-#include "RNVRApplicationImpl.h"
 
 namespace ART
 {
@@ -15,9 +16,9 @@ Application::~Application()
 
 void Application::WillFinishLaunching(RN::Kernel *kernel)
 {
-	RN::Application::WillFinishLaunching(kernel);
+	RN::Application::WillFinishLaunching(kernel); // NOLINT(bugprone-parent-virtual-call)
 
-	if (!RN::Kernel::GetSharedInstance()->GetArguments().HasArgument("pancake", '2d'))
+	if (!RN::Kernel::GetSharedInstance()->GetArguments().HasArgument("pancake", '2d')) // NOLINT
 	{
 		SetupVR();
 	}
@@ -33,7 +34,7 @@ void Application::DidFinishLaunching(RN::Kernel *kernel)
 	RN::Shader::ArgumentSampler::SetDefaultAnisotropy(16);
 #endif
 
-	World *world = new World(GetVRWindow());
+	auto *world = new World(GetVRWindow());
 	RN::SceneManager::GetSharedInstance()->AddScene(world->Autorelease());
 }
 } // namespace ART

@@ -6,11 +6,11 @@ namespace ART
 {
 CameraManager::CameraManager() : _defaultPreviewWindowResolution(960, 540), _vrWindow(nullptr), _vrCamera(nullptr), _headCamera(nullptr), _previewCamera(nullptr), _previewWindow(nullptr), _copyEyeToScreenMaterial(nullptr), _vrDebugWindow(nullptr), _cameraTargetAmbientColor(RN::Color::Black()), _cameraTargetAmbientColorChangeRate(RN::Color::Black()), _cameraTargetAmbientColorCompletedCallback(nullptr), _cameraTargetAmbientColorIsWaitingForLastFrame(false), _resetPositionAndRotation(true), _passthroughLayer(nullptr)
 {
-	RN::Dictionary *resolutionDictionary = RN::Settings::GetSharedInstance()->GetEntryForKey<RN::Dictionary>(RNCSTR("RNResolution"));
+	auto *resolutionDictionary = RN::Settings::GetSharedInstance()->GetEntryForKey<RN::Dictionary>(RNCSTR("RNResolution"));
 	if (resolutionDictionary)
 	{
-		RN::Number *widthNumber = resolutionDictionary->GetObjectForKey<RN::Number>(RNCSTR("width"));
-		RN::Number *heightNumber = resolutionDictionary->GetObjectForKey<RN::Number>(RNCSTR("height"));
+		auto *widthNumber = resolutionDictionary->GetObjectForKey<RN::Number>(RNCSTR("width"));
+		auto *heightNumber = resolutionDictionary->GetObjectForKey<RN::Number>(RNCSTR("height"));
 
 		if (widthNumber)
 		{
@@ -416,7 +416,7 @@ void CameraManager::GeneratePipeline()
 			msaaFramebuffer->SetDepthStencilTarget(RN::Framebuffer::TargetView::WithTexture(msaaDepthTexture));
 
 			_previewCamera->GetRenderPass()->SetFramebuffer(msaaFramebuffer);
-			RN::PostProcessingAPIStage *resolvePass = new RN::PostProcessingAPIStage(RN::PostProcessingAPIStage::Type::ResolveMSAA);
+			auto *resolvePass = new RN::PostProcessingAPIStage(RN::PostProcessingAPIStage::Type::ResolveMSAA);
 			resolvePass->SetFramebuffer(_previewWindow->GetFramebuffer());
 			_previewCamera->GetRenderPass()->AddRenderPass(resolvePass->Autorelease());
 		}
