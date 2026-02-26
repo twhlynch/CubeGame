@@ -12,20 +12,20 @@
 
 namespace ART
 {
-	namespace Types
-	{
-		enum CollisionType
-		{
-			CollisionLevel = 1 << 0,
+namespace Types
+{
+enum CollisionType
+{
+	CollisionLevel = 1 << 0,
 
-			CollisionAll = 0xffffffff
-		};
-		
-		enum MaterialType
-		{
-			MaterialDefault
-		};
-	}
-}
+	CollisionAll = 0xffffffff
+};
+
+enum MaterialType
+{
+	MaterialDefault
+};
+} // namespace Types
+} // namespace ART
 
 #endif /* defined(__ART_TYPES_H_) */

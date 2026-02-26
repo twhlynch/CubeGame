@@ -5,8 +5,7 @@
 	"release-directory": "Releases",
 	"cmake-build-type": "Release",
 	"cmake-parameters": "",
-	"cmake-targets~android":
-	[
+	"cmake-targets~android": [
 		"Rayne",
 		"RayneJolt",
 		"RayneVulkan",
@@ -26,8 +25,5 @@
 	],
 	"keystore~android": "../../AndroidReleaseKeyStore",
 	"build-secrets": "Other/build-secrets.json",
-	"dependencies":
-	{
-		
-	}
+	"dependencies": {}
 }

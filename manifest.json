@@ -1,11 +1,7 @@
 {
 	"RNApplication": "AR-Test",
-	"RNSearchPaths":
-	[
-		"./Resources"
-	],
-	"RNModules":
-	[
+	"RNSearchPaths": ["./Resources"],
+	"RNModules": [
 		"Modules/RayneMetal",
 		"Modules/RayneVulkan",
 		"Modules/RayneOpenXR"

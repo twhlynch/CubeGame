@@ -1,33 +1,21 @@
 [
 	{
 		"file": "Base.hlsl",
-		"shaders":
-		[
+		"shaders": [
 			{
 				"name": "main_vertex",
 				"type": "vertex",
 
-				"signature":
-				{
-					"options":
-					[
-						"RN_ANIMATIONS",
-						"RN_UV0",
-						"RN_COLOR"
-					]
+				"signature": {
+					"options": ["RN_ANIMATIONS", "RN_UV0", "RN_COLOR"]
 				}
 			},
 			{
 				"name": "main_fragment",
 				"type": "fragment",
 
-				"signature":
-				{
-					"options":
-					[
-						"RN_UV0",
-						"RN_COLOR"
-					]
+				"signature": {
+					"options": ["RN_UV0", "RN_COLOR"]
 				}
 			}
 		]
@@ -35,8 +23,7 @@
 
 	{
 		"file": "PostProcessing.hlsl",
-		"shaders":
-		[
+		"shaders": [
 			{
 				"name": "pp_vertex",
 				"type": "vertex"

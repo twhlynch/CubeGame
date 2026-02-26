@@ -25,8 +25,16 @@ option(RN_BUILD_OPENXR_MODULE "Build the OpenXR module" ON)
 option(RN_BUILD_APPLEXR_MODULE "Build the AppleXR module" ON)
 option(RN_BUILD_VRSTUB_MODULE "Build the VRStub module" ON)
 
-set(RN_BUILD_CONFIGURATION "independent" CACHE STRING "The build configuration.")
-set_property(CACHE RN_BUILD_CONFIGURATION PROPERTY STRINGS independent oculus steam pico)
+set(
+	RN_BUILD_CONFIGURATION
+	"independent"
+	CACHE STRING
+	"The build configuration."
+)
+set_property(
+	CACHE RN_BUILD_CONFIGURATION
+	PROPERTY STRINGS independent oculus steam pico
+)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Build)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/Build)
@@ -45,7 +53,10 @@ else()
 	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 endif()
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../Rayne" "${CMAKE_CURRENT_BINARY_DIR}/Rayne")
+add_subdirectory(
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../Rayne"
+	"${CMAKE_CURRENT_BINARY_DIR}/Rayne"
+)
 
 if(WIN32)
 	set(CMAKE_SYSTEM_VERSION "10.0.10240.0")
@@ -56,27 +67,35 @@ if(APPLE)
 	if(IOS OR VISIONOS)
 		set(CMAKE_INSTALL_RPATH @executable_path;@executable_path/Frameworks)
 	else()
-		set(CMAKE_INSTALL_RPATH @executable_path;@executable_path/../Resources/Modules/RayneJolt;@executable_path/../Resources/Modules/RayneMetal;@executable_path/../Resources/Modules/RayneOpenXR;@executable_path/../Resources/Modules/RayneVR)
+		set(
+			CMAKE_INSTALL_RPATH
+			@executable_path;@executable_path/../Resources/Modules/RayneJolt;@executable_path/../Resources/Modules/RayneMetal;@executable_path/../Resources/Modules/RayneOpenXR;@executable_path/../Resources/Modules/RayneVR
+		)
 	endif()
 elseif(UNIX)
-	set(CMAKE_INSTALL_RPATH \$ORIGIN;\$ORIGIN/Resources/Modules/RayneJolt;\$ORIGIN/Resources/Modules/RayneVulkan;\$ORIGIN/Resources/Modules/RayneOpenXR;\$ORIGIN/Resources/Modules/RayneVR)
+	set(
+		CMAKE_INSTALL_RPATH
+		\$ORIGIN;\$ORIGIN/Resources/Modules/RayneJolt;\$ORIGIN/Resources/Modules/RayneVulkan;\$ORIGIN/Resources/Modules/RayneOpenXR;\$ORIGIN/Resources/Modules/RayneVR
+	)
 endif()
 
-set(SOURCES
+set(
+	SOURCES
 	Sources/main.cpp
 	Sources/ARTApplication.cpp
 	Sources/ARTCameraManager.cpp
-	Sources/ARTWorld.cpp)
+	Sources/ARTWorld.cpp
+)
 
-set(HEADERS
+set(
+	HEADERS
 	Sources/ARTApplication.h
 	Sources/ARTCameraManager.h
 	Sources/ARTWorld.h
-	Sources/AR-TestLib.h)
+	Sources/AR-TestLib.h
+)
 
-set(RESOURCES
-	manifest.json
-	Resources)
+set(RESOURCES manifest.json Resources)
 
 if(IOS OR VISIONOS)
 	set(SOURCES_SWIFT Sources/main-apple.swift)
@@ -85,25 +104,34 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 
 if(ANDROID)
-    add_library(AR-Test SHARED "${SOURCES}" "${HEADERS}")
+	add_library(AR-Test SHARED "${SOURCES}" "${HEADERS}")
 elseif(IOS OR VISIONOS)
 	add_library(AR-TestLib STATIC "${SOURCES}" "${HEADERS}")
 	set_target_properties(AR-TestLib PROPERTIES FRAMEWORK TRUE)
-    set_target_properties(AR-TestLib PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER com.slindev.AR-TestLib)
-    set_property(TARGET AR-TestLib PROPERTY PUBLIC_HEADER ${HEADERS})
-    set_target_properties(AR-TestLib PROPERTIES XCODE_ATTRIBUTE_DEFINES_MODULE YES)
-    target_compile_options(AR-TestLib PRIVATE -xobjective-c++)
+	set_target_properties(
+		AR-TestLib
+		PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER com.slindev.AR-TestLib
+	)
+	set_property(TARGET AR-TestLib PROPERTY PUBLIC_HEADER ${HEADERS})
+	set_target_properties(AR-TestLib PROPERTIES XCODE_ATTRIBUTE_DEFINES_MODULE YES)
+	target_compile_options(AR-TestLib PRIVATE -xobjective-c++)
 
 	add_executable(AR-Test "${SOURCES_SWIFT}")
-	set_target_properties(AR-Test PROPERTIES XCODE_ATTRIBUTE_SWIFT_OBJC_INTEROP_MODE objcxx)
+	set_target_properties(
+		AR-Test
+		PROPERTIES XCODE_ATTRIBUTE_SWIFT_OBJC_INTEROP_MODE objcxx
+	)
 	target_link_libraries(AR-Test PUBLIC AR-TestLib)
 else()
-    add_executable(AR-Test "${SOURCES}" "${HEADERS}")
+	add_executable(AR-Test "${SOURCES}" "${HEADERS}")
 endif()
 
 target_include_directories(AR-Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Sources)
 
-set(ADDITIONAL_RESOURCE_COPY_PARAMS "--resourcespec=${CMAKE_CURRENT_SOURCE_DIR}/resources.json")
+set(
+	ADDITIONAL_RESOURCE_COPY_PARAMS
+	"--resourcespec=${CMAKE_CURRENT_SOURCE_DIR}/resources.json"
+)
 rayne_copy_resources(AR-Test "${RESOURCES}" "${ADDITIONAL_RESOURCE_COPY_PARAMS}")
 
 rayne_link_with(AR-Test)
@@ -133,28 +161,59 @@ elseif(${RN_BUILD_CONFIGURATION} STREQUAL "steam")
 elseif(${RN_BUILD_CONFIGURATION} STREQUAL "pico")
 	set(ART_COMPILE_DEFINITIONS ${ART_COMPILE_DEFINITIONS} -DBUILD_FOR_PICO)
 elseif(WIN32)
-	add_custom_command(TARGET AR-Test POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/Other/RunPancake-windows.bat $<TARGET_FILE_DIR:AR-Test>/RunPancake-windows.bat)
-	add_custom_command(TARGET GRAB POST_BUILD
-	  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:GRAB> $<TARGET_RUNTIME_DLLS:GRAB>
-	  COMMAND_EXPAND_LISTS)
+	add_custom_command(
+		TARGET AR-Test
+		POST_BUILD
+		COMMAND
+			${CMAKE_COMMAND} -E copy
+			${CMAKE_CURRENT_SOURCE_DIR}/Other/RunPancake-windows.bat
+			$<TARGET_FILE_DIR:AR-Test>/RunPancake-windows.bat
+	)
+	add_custom_command(
+		TARGET GRAB
+		POST_BUILD
+		COMMAND
+			${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:GRAB>
+			$<TARGET_RUNTIME_DLLS:GRAB>
+		COMMAND_EXPAND_LISTS
+	)
 endif()
 
 target_compile_definitions(AR-Test PRIVATE ${ART_COMPILE_DEFINITIONS})
 
 if(APPLE)
 	if(IOS OR VISIONOS)
-		set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING 0.0.1)
+		set_target_properties(
+			AR-Test
+			PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING 0.0.1
+		)
 		set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION 1)
 	endif()
 
 	set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE TRUE)
-	set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Other/Info.plist.in)
-	set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.index.ar-test)
+	set_target_properties(
+		AR-Test
+		PROPERTIES
+			MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Other/Info.plist.in
+	)
+	set_target_properties(
+		AR-Test
+		PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.index.ar-test
+	)
 
-	set_target_properties(AR-Test PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
-	set_target_properties(AR-Test PROPERTIES XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "LDF4CM9KT3")
+	set_target_properties(
+		AR-Test
+		PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
+	)
+	set_target_properties(
+		AR-Test
+		PROPERTIES XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "LDF4CM9KT3"
+	)
 endif()
 
 if(MSVC)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT AR-Test)
+	set_property(
+		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		PROPERTY VS_STARTUP_PROJECT AR-Test
+	)
 endif()
