@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 include(ExternalProject)
 
-project(AR-Test)
+project(ARTest)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../Rayne/CMake/Rayne.cmake)
 set(CMAKE_XCODE_GENERATE_TOP_LEVEL_PROJECT_ONLY ON)
@@ -92,7 +92,7 @@ set(
 	Sources/ARTApplication.h
 	Sources/ARTCameraManager.h
 	Sources/ARTWorld.h
-	Sources/AR-TestLib.h
+	Sources/ARTestLib.h
 )
 
 set(RESOURCES manifest.json Resources)
@@ -104,54 +104,54 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 
 if(ANDROID)
-	add_library(AR-Test SHARED "${SOURCES}" "${HEADERS}")
+	add_library(ARTest SHARED "${SOURCES}" "${HEADERS}")
 elseif(IOS OR VISIONOS)
-	add_library(AR-TestLib STATIC "${SOURCES}" "${HEADERS}")
-	set_target_properties(AR-TestLib PROPERTIES FRAMEWORK TRUE)
+	add_library(ARTestLib STATIC "${SOURCES}" "${HEADERS}")
+	set_target_properties(ARTestLib PROPERTIES FRAMEWORK TRUE)
 	set_target_properties(
-		AR-TestLib
-		PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER com.slindev.AR-TestLib
+		ARTestLib
+		PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER com.index.ARTestLib
 	)
-	set_property(TARGET AR-TestLib PROPERTY PUBLIC_HEADER ${HEADERS})
-	set_target_properties(AR-TestLib PROPERTIES XCODE_ATTRIBUTE_DEFINES_MODULE YES)
-	target_compile_options(AR-TestLib PRIVATE -xobjective-c++)
+	set_property(TARGET ARTestLib PROPERTY PUBLIC_HEADER ${HEADERS})
+	set_target_properties(ARTestLib PROPERTIES XCODE_ATTRIBUTE_DEFINES_MODULE YES)
+	target_compile_options(ARTestLib PRIVATE -xobjective-c++)
 
-	add_executable(AR-Test "${SOURCES_SWIFT}")
+	add_executable(ARTest "${SOURCES_SWIFT}")
 	set_target_properties(
-		AR-Test
+		ARTest
 		PROPERTIES XCODE_ATTRIBUTE_SWIFT_OBJC_INTEROP_MODE objcxx
 	)
-	target_link_libraries(AR-Test PUBLIC AR-TestLib)
+	target_link_libraries(ARTest PUBLIC ARTestLib)
 else()
-	add_executable(AR-Test "${SOURCES}" "${HEADERS}")
+	add_executable(ARTest "${SOURCES}" "${HEADERS}")
 endif()
 
-target_include_directories(AR-Test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Sources)
+target_include_directories(ARTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Sources)
 
 set(
 	ADDITIONAL_RESOURCE_COPY_PARAMS
 	"--resourcespec=${CMAKE_CURRENT_SOURCE_DIR}/resources.json"
 )
-rayne_copy_resources(AR-Test "${RESOURCES}" "${ADDITIONAL_RESOURCE_COPY_PARAMS}")
+rayne_copy_resources(ARTest "${RESOURCES}" "${ADDITIONAL_RESOURCE_COPY_PARAMS}")
 
-rayne_link_with(AR-Test)
-rayne_use_modules(AR-Test RayneJolt)
-rayne_use_modules(AR-Test RayneVR)
+rayne_link_with(ARTest)
+rayne_use_modules(ARTest RayneJolt)
+rayne_use_modules(ARTest RayneVR)
 
 if(NOT APPLE)
-	rayne_use_modules(AR-Test RayneOpenXR)
+	rayne_use_modules(ARTest RayneOpenXR)
 endif()
 
 if(VISIONOS)
-	rayne_use_modules(AR-Test RayneAppleXR)
+	rayne_use_modules(ARTest RayneAppleXR)
 endif()
 
 if(NOT APPLE AND ${RN_BUILD_VULKAN_MODULE})
-	rayne_use_modules(AR-Test RayneVulkan)
+	rayne_use_modules(ARTest RayneVulkan)
 endif()
 
 if(APPLE AND ${RN_BUILD_METAL_MODULE})
-	rayne_use_modules(AR-Test RayneMetal)
+	rayne_use_modules(ARTest RayneMetal)
 endif()
 
 if(${RN_BUILD_CONFIGURATION} STREQUAL "oculus")
@@ -162,12 +162,12 @@ elseif(${RN_BUILD_CONFIGURATION} STREQUAL "pico")
 	set(ART_COMPILE_DEFINITIONS ${ART_COMPILE_DEFINITIONS} -DBUILD_FOR_PICO)
 elseif(WIN32)
 	add_custom_command(
-		TARGET AR-Test
+		TARGET ARTest
 		POST_BUILD
 		COMMAND
 			${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/Other/RunPancake-windows.bat
-			$<TARGET_FILE_DIR:AR-Test>/RunPancake-windows.bat
+			$<TARGET_FILE_DIR:ARTest>/RunPancake-windows.bat
 	)
 	add_custom_command(
 		TARGET GRAB
@@ -179,34 +179,34 @@ elseif(WIN32)
 	)
 endif()
 
-target_compile_definitions(AR-Test PRIVATE ${ART_COMPILE_DEFINITIONS})
+target_compile_definitions(ARTest PRIVATE ${ART_COMPILE_DEFINITIONS})
 
 if(APPLE)
 	if(IOS OR VISIONOS)
 		set_target_properties(
-			AR-Test
+			ARTest
 			PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING 0.0.1
 		)
-		set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION 1)
+		set_target_properties(ARTest PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION 1)
 	endif()
 
-	set_target_properties(AR-Test PROPERTIES MACOSX_BUNDLE TRUE)
+	set_target_properties(ARTest PROPERTIES MACOSX_BUNDLE TRUE)
 	set_target_properties(
-		AR-Test
+		ARTest
 		PROPERTIES
 			MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Other/Info.plist.in
 	)
 	set_target_properties(
-		AR-Test
-		PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.index.ar-test
+		ARTest
+		PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.index.artest
 	)
 
 	set_target_properties(
-		AR-Test
+		ARTest
 		PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
 	)
 	set_target_properties(
-		AR-Test
+		ARTest
 		PROPERTIES XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "LDF4CM9KT3"
 	)
 endif()
@@ -214,6 +214,6 @@ endif()
 if(MSVC)
 	set_property(
 		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		PROPERTY VS_STARTUP_PROJECT AR-Test
+		PROPERTY VS_STARTUP_PROJECT ARTst
 	)
 endif()

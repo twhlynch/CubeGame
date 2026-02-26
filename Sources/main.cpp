@@ -1,13 +1,13 @@
 //
 //  main.cpp
-//  AR-Test
+//  ARTest
 //
 //  Copyright 2026 by index. All rights reserved.
 //
 
 #include <Rayne.h>
 
-#include "AR-TestLib.h"
+#include "ARTestLib.h"
 
 #if RN_BUILD_RELEASE
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")

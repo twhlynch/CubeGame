@@ -11,7 +11,7 @@
 /.cache
 
 # lsp config
-/build/compile_commands.json
+/build
 /buildServer.json
 
 # blender

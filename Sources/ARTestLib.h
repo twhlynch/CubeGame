@@ -1,6 +1,6 @@
 //
-//  AR-TestLib.h
-//  AR-Test
+//  ARTestLib.h
+//  ARTest
 //
 //  Copyright 2026 by index. All rights reserved.
 //

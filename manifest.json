@@ -1,5 +1,5 @@
 {
-	"RNApplication": "AR-Test",
+	"RNApplication": "ARTest",
 	"RNSearchPaths": ["./Resources"],
 	"RNModules": [
 		"Modules/RayneMetal",

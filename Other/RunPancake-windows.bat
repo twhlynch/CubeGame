@@ -1,1 +1,1 @@
-AR-Test.exe --pancake
+ARTest.exe --pancake

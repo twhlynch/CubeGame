@@ -1,13 +1,13 @@
 //
 //  main-apple.swift
-//  AR-Test
+//  ARTest
 //
 //  Copyright 2026 by index. All rights reserved.
 //
 
 import SwiftUI
 import MetalKit
-import AR-TestLib
+import ARTestLib
 
 #if os(iOS)
 @main

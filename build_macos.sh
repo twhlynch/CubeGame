@@ -1,9 +1,9 @@
 xcodebuild \
-	-project Builds/macos_independent/AR-Test.xcodeproj \
-	-scheme AR-Test \
+	-project Builds/macos_independent/ARTest.xcodeproj \
+	-scheme ARTest \
 	-configuration Debug \
 	build | xcpretty
 
-open ./Builds/macos_independent/build/AR-Test/Debug/AR-Test.app
+open ./Builds/macos_independent/build/ARTest/Debug/ARTest.app
 
 read

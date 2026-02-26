@@ -1,6 +1,6 @@
 //
 //  ARTTypes.h
-//  AR-Test
+//  ARTest
 //
 //  Copyright 2026 by index. All rights reserved.
 //
