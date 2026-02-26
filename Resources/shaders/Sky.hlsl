@@ -5,14 +5,6 @@
 //  Copyright 2026 by index. All rights reserved.
 //
 
-#pragma permutator RN_UV0
-#pragma permutator RN_COLOR
-
-#if RN_UV0
-SamplerState linearClampSampler;
-Texture2D texture0;
-#endif
-
 cbuffer vertexUniforms
 {
 #if RN_USE_MULTIVIEW
@@ -26,20 +18,11 @@ cbuffer vertexUniforms
 
 cbuffer fragmentUniforms
 {
-	float4 cameraAmbientColor;
-	float4 diffuseColor;
 };
 
 struct InputVertex
 {
 	[[vk::location(0)]] float3 position : POSITION;
-
-#if RN_UV0
-	[[vk::location(5)]] float2 texCoords : TEXCOORD0;
-#endif
-#if RN_COLOR
-	[[vk::location(3)]] float4 color : COLOR0;
-#endif
 
 #if RN_USE_MULTIVIEW
 	uint viewIndex : SV_VIEWID;
@@ -49,14 +32,6 @@ struct InputVertex
 struct FragmentVertex
 {
 	float4 position : SV_POSITION;
-
-#if RN_UV0
-	float2 texCoords : TEXCOORD0;
-#endif
-
-#if RN_COLOR
-	float3 color : COLOR0;
-#endif
 };
 
 FragmentVertex sky_vertex(InputVertex vert)
@@ -73,31 +48,11 @@ FragmentVertex sky_vertex(InputVertex vert)
 	result.position.z = 0.0;
 #endif
 
-#if RN_UV0
-	result.texCoords = vert.texCoords;
-#endif
-
-#if RN_COLOR
-	result.color = vert.color.rgb;
-#endif
-
 	return result;
 }
 
-
 float4 sky_fragment(FragmentVertex vert) : SV_TARGET
 {
-	float4 color = diffuseColor;
-
-#if RN_UV0
-	color *= texture0.Sample(linearClampSampler, vert.texCoords).rgba;
-#endif
-
-#if RN_COLOR
-	color.rgb *= vert.color;
-#endif
-
-	color.rgb *= cameraAmbientColor.rgb;
-	return color;
+	// no color, allow seeing passthrough
+	return float4(0.0.xxxx);
 }
-

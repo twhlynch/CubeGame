@@ -67,6 +67,8 @@ protected:
 	RN::uint8 _msaa;
 
 	bool _resetPositionAndRotation;
+
+	RN::VRCompositorLayer *_passthroughLayer;
 };
 } // namespace ART
 

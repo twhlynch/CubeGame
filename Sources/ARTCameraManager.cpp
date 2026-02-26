@@ -11,7 +11,7 @@
 
 namespace ART
 {
-CameraManager::CameraManager() : _defaultPreviewWindowResolution(960, 540), _vrWindow(nullptr), _vrCamera(nullptr), _headCamera(nullptr), _previewCamera(nullptr), _previewWindow(nullptr), _copyEyeToScreenMaterial(nullptr), _vrDebugWindow(nullptr), _cameraTargetAmbientColor(RN::Color::Black()), _cameraTargetAmbientColorChangeRate(RN::Color::Black()), _cameraTargetAmbientColorCompletedCallback(nullptr), _cameraTargetAmbientColorIsWaitingForLastFrame(false), _resetPositionAndRotation(true)
+CameraManager::CameraManager() : _defaultPreviewWindowResolution(960, 540), _vrWindow(nullptr), _vrCamera(nullptr), _headCamera(nullptr), _previewCamera(nullptr), _previewWindow(nullptr), _copyEyeToScreenMaterial(nullptr), _vrDebugWindow(nullptr), _cameraTargetAmbientColor(RN::Color::Black()), _cameraTargetAmbientColorChangeRate(RN::Color::Black()), _cameraTargetAmbientColorCompletedCallback(nullptr), _cameraTargetAmbientColorIsWaitingForLastFrame(false), _resetPositionAndRotation(true), _passthroughLayer(nullptr)
 {
 	RN::Dictionary *resolutionDictionary = RN::Settings::GetSharedInstance()->GetEntryForKey<RN::Dictionary>(RNCSTR("RNResolution"));
 	if (resolutionDictionary)
@@ -67,6 +67,15 @@ void CameraManager::Setup(RN::VRWindow *vrWindow)
 	}
 
 	GeneratePipeline();
+
+#if (defined(BUILD_FOR_OCULUS) && RN_PLATFORM_ANDROID) || RN_PLATFORM_MAC_OS
+	if (_vrWindow)
+	{
+		_passthroughLayer = _vrWindow->CreateCompositorLayer(RN::VRCompositorLayer::TypePassthrough, RN::Window::SwapChainDescriptor(), RN::Vector2(), false);
+		_vrWindow->AddCompositorLayer(_passthroughLayer->Autorelease(), true, true);
+		_vrWindow->SetPassthroughActive(true);
+	}
+#endif
 }
 
 RN::VRHMDTrackingState::Mode CameraManager::Update(float delta)

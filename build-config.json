@@ -19,9 +19,12 @@
 		"png_static",
 		"ARTest"
 	],
-	"permissions~android":
-	[
-		
+	"permissions~android": [
+		{
+			"type": "feature",
+			"name": "com.oculus.feature.PASSTHROUGH",
+			"required": true
+		}
 	],
 	"keystore~android": "../../AndroidReleaseKeyStore",
 	"build-secrets": "Other/build-secrets.json",
