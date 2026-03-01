@@ -54,7 +54,7 @@ void Hand::UpdateLeftHand(float /*delta*/)
 {
 	World *world = World::GetSharedInstance();
 
-	// pinch to spawn cube
+	// pinch index to spawn cube
 	if (_pinching.at(0) && !_wasPinching.at(0))
 	{
 		auto *index = _indicator.at(2);
@@ -111,14 +111,14 @@ void Hand::UpdateFingers(float /*delta*/)
 	World *world = World::GetSharedInstance();
 	RN::VRCamera *vrCamera = world->GetVRCamera();
 
-	// update state
-	_wasPinching = _pinching;
-	_pinching = {false};
-
 	// get new state
 	const RN::VRHandTrackingState hand = vrCamera->GetHandTrackingState(_handIndex);
 
 	if (!hand.tracking) { return; }
+
+	// update state
+	_wasPinching = _pinching;
+	_pinching = {false};
 
 	// get joint states
 	const auto palm = hand.joints[RN::VRHandTrackingState::Joint::Palm];

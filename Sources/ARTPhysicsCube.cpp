@@ -6,8 +6,9 @@
 namespace ART
 {
 
-static constexpr float scale = 0.06f;
-static constexpr float mass = 1.0f;
+static constexpr float scale = 0.03f;
+static constexpr float mass = 0.5f;
+static constexpr float friction = 0.5f;
 
 RN::Model *PhysicsCube::DefaultModel()
 {
@@ -31,6 +32,7 @@ PhysicsCube::PhysicsCube() : RN::Entity(DefaultModel())
 	_physicsBody->SetAllowSleeping(false);
 	_physicsBody->SetEnableSleeping(false);
 	_physicsBody->SetEnableGravity(true);
+	_physicsBody->SetFriction(friction);
 }
 
 RN::JoltDynamicBody *PhysicsCube::GetPhysicsBody() const

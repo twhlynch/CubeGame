@@ -187,7 +187,7 @@ void World::LoadLevel()
 	// ground plane
 	auto *groundModel = AssignShader(RN::Model::WithCube(RN::Color::ClearColor()), Types::MaterialType::MaterialDefault);
 	auto *groundEntity = new RN::Entity(groundModel);
-	groundEntity->SetScale(RN::Vector3(10.0f, 0.1f, 10.0f));
+	groundEntity->SetScale(RN::Vector3(50.0f, 0.1f, 50.0f));
 	groundEntity->SetPosition(RN::Vector3(0.0f, -0.5f, 0.0f));
 
 	auto *groundMaterial = new RN::JoltMaterial();
