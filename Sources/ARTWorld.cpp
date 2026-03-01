@@ -1,8 +1,9 @@
 #include "ARTWorld.h"
 
-#include <Rendering/RNMaterial.h>
+#include <RNJoltShape.h>
 
 #include "ARTHand.h"
+#include "ARTPhysicsCube.h"
 #include "ARTTypes.h"
 
 namespace ART
@@ -96,6 +97,11 @@ void World::WillUpdate(float delta)
 	{
 		Exit();
 	}
+
+	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("SPACE")))
+	{
+		AddSmallCube({0, 1, 0});
+	}
 }
 
 RN::Model *World::AssignShader(RN::Model *model, Types::MaterialType materialType) const
@@ -167,21 +173,32 @@ void World::RemoveAllLevelNodes()
 	_levelNodes->RemoveAllObjects();
 }
 
+void World::AddSmallCube(RN::Vector3 position)
+{
+	auto *cube = new PhysicsCube();
+	cube->SetPosition(position);
+	AddLevelNode(cube->Autorelease());
+}
+
 void World::LoadLevel()
 {
 	RemoveAllLevelNodes();
 
-	RN::Model *cubeModel = AssignShader(RN::Model::WithCube(RN::Color::Red()), Types::MaterialType::MaterialDefault);
-	auto *cubeEntity = new RN::Entity(cubeModel);
-	cubeEntity->SetScale(0.1f);
-	AddLevelNode(cubeEntity->Autorelease());
+	// ground plane
+	auto *groundModel = AssignShader(RN::Model::WithCube(RN::Color::ClearColor()), Types::MaterialType::MaterialDefault);
+	auto *groundEntity = new RN::Entity(groundModel);
+	groundEntity->SetScale(RN::Vector3(10.0f, 0.1f, 10.0f));
+	groundEntity->SetPosition(RN::Vector3(0.0f, -0.5f, 0.0f));
 
-	auto *cubePhysicsMaterial = new RN::JoltMaterial();
-	auto *cubeShape = RN::JoltCompoundShape::WithModel(cubeModel, cubePhysicsMaterial->Autorelease(), RN::Vector3(1.0f, 1.0f, 1.0f), true);
-	auto *cubeBody = RN::JoltStaticBody::WithShape(cubeShape);
-	cubeBody->SetCollisionFilter(Types::CollisionLevel, Types::CollisionAll);
-	cubeEntity->AddAttachment(cubeBody);
+	auto *groundMaterial = new RN::JoltMaterial();
+	auto *groundShape = RN::JoltCompoundShape::WithModel(groundModel, groundMaterial->Autorelease(), groundEntity->GetScale(), true);
+	auto *groundBody = RN::JoltStaticBody::WithShape(groundShape);
+	groundBody->SetCollisionFilter(Types::CollisionLevel, Types::CollisionAll);
 
+	groundEntity->AddAttachment(groundBody);
+	AddLevelNode(groundEntity->Autorelease());
+
+	// hands
 	auto *leftHand = new Hand(0);
 	auto *rightHand = new Hand(1);
 	AddLevelNode(leftHand->Autorelease());
@@ -189,6 +206,7 @@ void World::LoadLevel()
 
 	if (!RN::Renderer::IsHeadless())
 	{
+		// sky
 		auto *skyMesh = RN::Mesh::WithColoredCube(100, RN::Color::White());
 		auto *skyMaterial = RN::Material::WithShaders(nullptr, nullptr);
 		skyMaterial->SetDepthMode(RN::DepthMode::GreaterOrEqual);
@@ -210,5 +228,7 @@ void World::LoadLevel()
 		skyEntity->SetRenderPriority(RN::SceneNode::RenderPriority::RenderSky);
 		AddLevelNode(skyEntity->Autorelease());
 	}
+
+	_physicsWorld->SetPaused(false);
 }
 } // namespace ART

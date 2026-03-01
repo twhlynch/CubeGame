@@ -28,6 +28,11 @@ void Application::DidFinishLaunching(RN::Kernel *kernel)
 {
 	RN::VRApplication::DidFinishLaunching(kernel);
 
+	if (!GetVRWindow() || !GetVRWindow()->EnableHandTracking())
+	{
+		RNDebug("EnableHandTracking failed");
+	}
+
 #if RN_PLATFORM_ANDROID
 	RN::Shader::ArgumentSampler::SetDefaultAnisotropy(4);
 #else

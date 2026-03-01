@@ -7,6 +7,7 @@ namespace ART::Types
 enum CollisionType
 {
 	CollisionLevel = 1 << 0,
+	CollisionGrabbable = 1 << 1,
 
 	CollisionAll = 0xffffffff
 };

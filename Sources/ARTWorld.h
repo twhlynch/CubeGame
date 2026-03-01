@@ -31,6 +31,8 @@ public:
 	void RemoveLevelNode(RN::SceneNode *node);
 	void RemoveAllLevelNodes();
 
+	void AddSmallCube(RN::Vector3 position);
+
 	bool GetIsDash() const { return _isDash; }
 
 	void LoadLevel();
