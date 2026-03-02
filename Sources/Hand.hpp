@@ -3,6 +3,7 @@
 #include <RNJoltShape.h>
 #include <Rayne.h>
 
+#include "PartsPicker.hpp"
 #include "PhysicsCube.hpp"
 
 namespace ART
@@ -16,10 +17,13 @@ public:
 
 	void Update(float delta) override;
 
+	PartsPicker *GetPartsPicker() { return _partsPicker; }
+	PhysicsCube *GetGrabbedObject() { return _grabbedObject; }
+
 private:
 	void UpdateFingers(float delta);
-	void UpdateLeftHand(float delta);
-	void UpdateRightHand(float delta);
+	void UpdateInteractions(float delta);
+	void UpdatePartsPicker(float delta);
 
 	void TryGrabObject();
 	void GrabObject(PhysicsCube *object);
@@ -41,6 +45,7 @@ private:
 	RN::Quaternion _grabRotationOffset;
 
 	PhysicsCube *_grabbedObject;
+	PartsPicker *_partsPicker;
 };
 
 } // namespace ART

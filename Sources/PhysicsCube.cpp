@@ -10,13 +10,7 @@ static constexpr float scale = 0.03f;
 static constexpr float mass = 0.5f;
 static constexpr float friction = 0.5f;
 
-RN::Model *PhysicsCube::DefaultModel()
-{
-	static auto *model = World::GetSharedInstance()->AssignShader(RN::Model::WithCube(RN::Color::Red()), Types::MaterialType::MaterialDefault);
-	return model;
-}
-
-PhysicsCube::PhysicsCube() : RN::Entity(DefaultModel())
+PhysicsCube::PhysicsCube(RN::Model *model) : RN::Entity(model)
 {
 	World *world = World::GetSharedInstance();
 
@@ -26,7 +20,7 @@ PhysicsCube::PhysicsCube() : RN::Entity(DefaultModel())
 	SetScale(scale);
 
 	_physicsBody = RN::JoltDynamicBody::WithShape(shape, mass);
-	_physicsBody->SetCollisionFilter(Types::CollisionGrabbable, Types::CollisionAll);
+	_physicsBody->SetCollisionFilter(Types::CollisionGrabbable, Types::CollisionLevel | Types::CollisionGrabbable | Types::CollisionTest);
 	AddAttachment(_physicsBody);
 
 	_physicsBody->SetAllowSleeping(false);

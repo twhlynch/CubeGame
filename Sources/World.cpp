@@ -36,7 +36,7 @@ void World::Exit()
 	// RN::Kernel::GetSharedInstance()->Exit();
 }
 
-World::World(RN::VRWindow *vrWindow) : _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr)
+World::World(RN::VRWindow *vrWindow) : _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr})
 {
 	_sharedInstance = this;
 
@@ -50,6 +50,8 @@ World::World(RN::VRWindow *vrWindow) : _vrWindow(nullptr), _physicsWorld(nullptr
 
 World::~World()
 {
+	SafeRelease(_hands.at(0));
+	SafeRelease(_hands.at(1));
 }
 
 void World::WillBecomeActive()
@@ -100,7 +102,10 @@ void World::WillUpdate(float delta)
 
 	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("SPACE")))
 	{
-		AddSmallCube({0, 1, 0});
+		static auto *model = AssignShader(RN::Model::WithCube(RN::Color::Red()), Types::MaterialType::MaterialDefault);
+		auto *cube = new PhysicsCube(model);
+		cube->SetPosition({0, 1, 0});
+		AddLevelNode(cube->Autorelease());
 	}
 }
 
@@ -173,13 +178,6 @@ void World::RemoveAllLevelNodes()
 	_levelNodes->RemoveAllObjects();
 }
 
-void World::AddSmallCube(RN::Vector3 position)
-{
-	auto *cube = new PhysicsCube();
-	cube->SetPosition(position);
-	AddLevelNode(cube->Autorelease());
-}
-
 void World::LoadLevel()
 {
 	RemoveAllLevelNodes();
@@ -199,10 +197,11 @@ void World::LoadLevel()
 	AddLevelNode(groundEntity->Autorelease());
 
 	// hands
-	auto *leftHand = new Hand(0);
-	auto *rightHand = new Hand(1);
-	AddLevelNode(leftHand->Autorelease());
-	AddLevelNode(rightHand->Autorelease());
+	if (!_hands.at(0)) { _hands.at(0) = new Hand(0); }
+	if (!_hands.at(1)) { _hands.at(1) = new Hand(1); }
+
+	AddLevelNode(_hands.at(0));
+	AddLevelNode(_hands.at(1));
 
 	if (!RN::Renderer::IsHeadless())
 	{

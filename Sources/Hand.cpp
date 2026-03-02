@@ -1,5 +1,10 @@
 #include "Hand.hpp"
 
+#include <Debug/RNLogger.h>
+#include <Scene/RNEntity.h>
+#include <Scene/RNSceneNode.h>
+
+#include "PartsPicker.hpp"
 #include "PhysicsCube.hpp"
 #include "Types.hpp"
 #include "World.hpp"
@@ -8,7 +13,7 @@ namespace ART
 {
 
 Hand::Hand(uint8_t index)
-	: _handIndex(index), _grabbedObject(nullptr), _intersectShape(nullptr)
+	: _handIndex(index), _grabbedObject(nullptr)
 {
 	World *world = World::GetSharedInstance();
 
@@ -25,6 +30,13 @@ Hand::Hand(uint8_t index)
 
 	_intersectShape = RN::JoltSphereShape::WithRadius(0.02f, nullptr);
 	_intersectShape->Retain();
+
+	// parts picker
+	_partsPicker = new PartsPicker();
+	auto *palm = _indicator.at(0);
+	palm->AddChild(_partsPicker->Autorelease());
+	_partsPicker->SetWorldScale(1);
+	_partsPicker->SetRotation(RN::Vector3(0, -20, 0));
 }
 
 Hand::~Hand()
@@ -45,24 +57,11 @@ void Hand::Update(float delta)
 	SetWorldPosition(vrCamera->GetWorldPosition());
 
 	UpdateFingers(delta);
-
-	if (_handIndex == 0) { UpdateLeftHand(delta); }
-	else if (_handIndex == 1) { UpdateRightHand(delta); }
+	UpdateInteractions(delta);
+	UpdatePartsPicker(delta);
 }
 
-void Hand::UpdateLeftHand(float /*delta*/)
-{
-	World *world = World::GetSharedInstance();
-
-	// pinch index to spawn cube
-	if (_pinching.at(0) && !_wasPinching.at(0))
-	{
-		auto *index = _indicator.at(2);
-		world->AddSmallCube(index->GetWorldPosition());
-	}
-}
-
-void Hand::UpdateRightHand(float delta)
+void Hand::UpdateInteractions(float delta)
 {
 	World *world = World::GetSharedInstance();
 	auto *index = _indicator.at(2);
@@ -104,6 +103,23 @@ void Hand::UpdateRightHand(float delta)
 	// next frame info
 	_previousPosition = index->GetWorldPosition();
 	_previousRotation = index->GetWorldRotation();
+}
+
+void Hand::UpdatePartsPicker(float /*delta*/)
+{
+	auto *palm = _indicator.at(0);
+	const auto handRotation = palm->GetWorldEulerAngle();
+
+	bool otherPickerHidden = World::GetSharedInstance()->GetHand(1 - _handIndex)->GetPartsPicker()->GetHidden();
+
+	if (_handIndex == 0)
+	{
+		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z > 30 || handRotation.z < -90);
+	}
+	else if (_handIndex == 1)
+	{
+		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z < -30 || handRotation.z > 90);
+	}
 }
 
 void Hand::UpdateFingers(float /*delta*/)
@@ -165,15 +181,32 @@ void Hand::TryGrabObject()
 	auto *index = _indicator.at(2);
 
 	// get colliding cube
-	auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionAll, Types::CollisionGrabbable);
+	auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionGrabbable);
 	for (const auto &info : overlaps)
 	{
 		if (!info.node) { continue; }
 		auto *cube = info.node->Downcast<PhysicsCube>();
 		if (!cube) { continue; }
+		if (cube == world->GetHand(1 - _handIndex)->GetGrabbedObject()) { continue; }
 
 		GrabObject(cube);
-		break;
+		return;
+	}
+
+	// get parts menu cube
+	overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionPartPicker);
+	for (const auto &info : overlaps)
+	{
+		if (!info.node) { continue; }
+		auto *cube = info.node->Downcast<RN::Entity>();
+		if (!cube) { continue; }
+
+		auto *physicsCube = new PhysicsCube(cube->GetModel());
+		physicsCube->SetPosition(cube->GetWorldPosition());
+		world->AddLevelNode(physicsCube->Autorelease());
+
+		GrabObject(physicsCube);
+		return;
 	}
 }
 

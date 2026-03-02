@@ -9,12 +9,12 @@ namespace ART
 class PhysicsCube : public RN::Entity
 {
 public:
-	PhysicsCube();
+	PhysicsCube(RN::Model *model);
 
 	RN::JoltDynamicBody *GetPhysicsBody() const;
 
 private:
-	static RN::Model *DefaultModel();
+	static RN::Model *DefaultModel(const RN::Color &color);
 
 	RN::JoltDynamicBody *_physicsBody;
 };

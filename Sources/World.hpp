@@ -2,8 +2,10 @@
 
 #include <RNJoltWorld.h>
 #include <Rayne.h>
+#include <cstdint>
 
 #include "CameraManager.hpp"
+#include "Hand.hpp"
 #include "Types.hpp"
 
 namespace ART
@@ -23,6 +25,7 @@ public:
 	RN::Camera *GetHeadCamera() const { return _cameraManager.GetHeadCamera(); }
 	RN::Camera *GetPreviewCamera() const { return _cameraManager.GetPreviewCamera(); }
 	CameraManager &GetCameraManager() { return _cameraManager; }
+	Hand *GetHand(uint8_t index) { return _hands.at(index); }
 
 	RN::Model *AssignShader(RN::Model *model, Types::MaterialType materialType) const;
 	RN::Model *MakeDeepCopy(RN::Model *model) const;
@@ -30,8 +33,6 @@ public:
 	void AddLevelNode(RN::SceneNode *node);
 	void RemoveLevelNode(RN::SceneNode *node);
 	void RemoveAllLevelNodes();
-
-	void AddSmallCube(RN::Vector3 position);
 
 	bool GetIsDash() const { return _isDash; }
 
@@ -55,6 +56,8 @@ protected:
 
 	bool _isPaused;
 	bool _isDash;
+
+	std::array<Hand *, 2> _hands;
 
 	static World *_sharedInstance;
 };
