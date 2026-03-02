@@ -3,7 +3,7 @@
 #include <RNJoltShape.h>
 #include <Rayne.h>
 
-#include "ARTPhysicsCube.h"
+#include "PhysicsCube.hpp"
 
 namespace ART
 {

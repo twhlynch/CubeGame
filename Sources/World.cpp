@@ -1,10 +1,10 @@
-#include "ARTWorld.h"
+#include "World.hpp"
 
 #include <RNJoltShape.h>
 
-#include "ARTHand.h"
-#include "ARTPhysicsCube.h"
-#include "ARTTypes.h"
+#include "Hand.hpp"
+#include "PhysicsCube.hpp"
+#include "Types.hpp"
 
 namespace ART
 {

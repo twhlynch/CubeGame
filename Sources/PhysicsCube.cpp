@@ -1,7 +1,7 @@
-#include "ARTPhysicsCube.h"
+#include "PhysicsCube.hpp"
 
-#include "ARTTypes.h"
-#include "ARTWorld.h"
+#include "Types.hpp"
+#include "World.hpp"
 
 namespace ART
 {

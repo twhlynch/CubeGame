@@ -4,10 +4,7 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#include "ARTApplication.h"
-#include "ARTCameraManager.h"
-#include "ARTTypes.h"
-#include "ARTWorld.h"
+#include "Application.hpp"
 
 #if RN_PLATFORM_VISIONOS
 #import <CompositorServices/CompositorServices.h>

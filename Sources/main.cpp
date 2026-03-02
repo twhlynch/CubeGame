@@ -1,6 +1,6 @@
 #include <Rayne.h>
 
-#include "ARTestLib.h"
+#include "ARTestLib.hpp"
 
 #if RN_BUILD_RELEASE
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")

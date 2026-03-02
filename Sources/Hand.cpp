@@ -1,8 +1,8 @@
-#include "ARTHand.h"
+#include "Hand.hpp"
 
-#include "ARTPhysicsCube.h"
-#include "ARTTypes.h"
-#include "ARTWorld.h"
+#include "PhysicsCube.hpp"
+#include "Types.hpp"
+#include "World.hpp"
 
 namespace ART
 {

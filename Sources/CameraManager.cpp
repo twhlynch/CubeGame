@@ -1,6 +1,6 @@
-#include "ARTCameraManager.h"
+#include "CameraManager.hpp"
 
-#include "ARTWorld.h"
+#include "World.hpp"
 
 namespace ART
 {

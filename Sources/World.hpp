@@ -3,8 +3,8 @@
 #include <RNJoltWorld.h>
 #include <Rayne.h>
 
-#include "ARTCameraManager.h"
-#include "ARTTypes.h"
+#include "CameraManager.hpp"
+#include "Types.hpp"
 
 namespace ART
 {

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 include(ExternalProject)
 
 project(ARTest)
+set(LIBRARY_NAME ${PROJECT_NAME}Lib)
+set(BUNDLE_DOMAIN com.index)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../Rayne/CMake/Rayne.cmake)
 set(CMAKE_XCODE_GENERATE_TOP_LEVEL_PROJECT_ONLY ON)
@@ -79,24 +81,16 @@ elseif(UNIX)
 	)
 endif()
 
-set(
-	SOURCES
-	Sources/main.cpp
-	Sources/ARTApplication.cpp
-	Sources/ARTCameraManager.cpp
-	Sources/ARTWorld.cpp
-	Sources/ARTHand.cpp
-	Sources/ARTPhysicsCube.cpp
+file(
+	GLOB_RECURSE SOURCES
+	CONFIGURE_DEPENDS
+	"${CMAKE_CURRENT_SOURCE_DIR}/Sources/*.cpp"
 )
 
-set(
-	HEADERS
-	Sources/ARTApplication.h
-	Sources/ARTCameraManager.h
-	Sources/ARTWorld.h
-	Sources/ARTestLib.h
-	Sources/ARTHand.h
-	Sources/ARTPhysicsCube.h
+file(
+	GLOB_RECURSE HEADERS
+	CONFIGURE_DEPENDS
+	"${CMAKE_CURRENT_SOURCE_DIR}/Sources/*.hpp"
 )
 
 set(RESOURCES manifest.json Resources)
@@ -108,70 +102,74 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 
 if(ANDROID)
-	add_library(ARTest SHARED "${SOURCES}" "${HEADERS}")
+	add_library(${PROJECT_NAME} SHARED "${SOURCES}" "${HEADERS}")
 elseif(IOS OR VISIONOS)
-	add_library(ARTestLib STATIC "${SOURCES}" "${HEADERS}")
-	set_target_properties(ARTestLib PROPERTIES FRAMEWORK TRUE)
+	add_library(${LIBRARY_NAME} STATIC "${SOURCES}" "${HEADERS}")
+	set_property(TARGET ${LIBRARY_NAME} PROPERTY PUBLIC_HEADER ${HEADERS})
+	target_compile_options(${LIBRARY_NAME} PRIVATE -xobjective-c++)
 	set_target_properties(
-		ARTestLib
-		PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER com.index.ARTestLib
+		${LIBRARY_NAME}
+		PROPERTIES
+			FRAMEWORK TRUE
+			MACOSX_FRAMEWORK_IDENTIFIER ${BUNDLE_DOMAIN}.${LIBRARY_NAME}
+			XCODE_ATTRIBUTE_DEFINES_MODULE YES
 	)
-	set_property(TARGET ARTestLib PROPERTY PUBLIC_HEADER ${HEADERS})
-	set_target_properties(ARTestLib PROPERTIES XCODE_ATTRIBUTE_DEFINES_MODULE YES)
-	target_compile_options(ARTestLib PRIVATE -xobjective-c++)
 
-	add_executable(ARTest "${SOURCES_SWIFT}")
+	add_executable(${PROJECT_NAME} "${SOURCES_SWIFT}")
+	target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARY_NAME})
 	set_target_properties(
-		ARTest
+		${PROJECT_NAME}
 		PROPERTIES XCODE_ATTRIBUTE_SWIFT_OBJC_INTEROP_MODE objcxx
 	)
-	target_link_libraries(ARTest PUBLIC ARTestLib)
 else()
-	add_executable(ARTest "${SOURCES}" "${HEADERS}")
+	add_executable(${PROJECT_NAME} "${SOURCES}" "${HEADERS}")
 endif()
 
-target_include_directories(ARTest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Sources)
+target_include_directories(
+	${PROJECT_NAME}
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Sources
+)
 
 set(
 	ADDITIONAL_RESOURCE_COPY_PARAMS
 	"--resourcespec=${CMAKE_CURRENT_SOURCE_DIR}/resources.json"
 )
-rayne_copy_resources(ARTest "${RESOURCES}" "${ADDITIONAL_RESOURCE_COPY_PARAMS}")
+rayne_copy_resources(${PROJECT_NAME} "${RESOURCES}" "${ADDITIONAL_RESOURCE_COPY_PARAMS}")
 
-rayne_link_with(ARTest)
-rayne_use_modules(ARTest RayneJolt)
-rayne_use_modules(ARTest RayneVR)
+rayne_link_with(${PROJECT_NAME})
+rayne_use_modules(${PROJECT_NAME} RayneJolt)
+rayne_use_modules(${PROJECT_NAME} RayneVR)
 
 if(NOT APPLE)
-	rayne_use_modules(ARTest RayneOpenXR)
+	rayne_use_modules(${PROJECT_NAME} RayneOpenXR)
 endif()
 
 if(VISIONOS)
-	rayne_use_modules(ARTest RayneAppleXR)
+	rayne_use_modules(${PROJECT_NAME} RayneAppleXR)
 endif()
 
-if(NOT APPLE AND ${RN_BUILD_VULKAN_MODULE})
-	rayne_use_modules(ARTest RayneVulkan)
+if(NOT APPLE AND RN_BUILD_VULKAN_MODULE)
+	rayne_use_modules(${PROJECT_NAME} RayneVulkan)
 endif()
 
-if(APPLE AND ${RN_BUILD_METAL_MODULE})
-	rayne_use_modules(ARTest RayneMetal)
+if(APPLE AND RN_BUILD_METAL_MODULE)
+	rayne_use_modules(${PROJECT_NAME} RayneMetal)
 endif()
 
 if(${RN_BUILD_CONFIGURATION} STREQUAL "oculus")
-	set(ART_COMPILE_DEFINITIONS ${ART_COMPILE_DEFINITIONS} -DBUILD_FOR_OCULUS)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -DBUILD_FOR_OCULUS)
 elseif(${RN_BUILD_CONFIGURATION} STREQUAL "steam")
-	set(ART_COMPILE_DEFINITIONS ${ART_COMPILE_DEFINITIONS} -DBUILD_FOR_STEAM)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -DBUILD_FOR_STEAM)
 elseif(${RN_BUILD_CONFIGURATION} STREQUAL "pico")
-	set(ART_COMPILE_DEFINITIONS ${ART_COMPILE_DEFINITIONS} -DBUILD_FOR_PICO)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE -DBUILD_FOR_PICO)
 elseif(WIN32)
 	add_custom_command(
-		TARGET ARTest
+		TARGET ${PROJECT_NAME}
 		POST_BUILD
 		COMMAND
 			${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/Other/RunPancake-windows.bat
-			$<TARGET_FILE_DIR:ARTest>/RunPancake-windows.bat
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>/RunPancake-windows.bat
 	)
 	add_custom_command(
 		TARGET GRAB
@@ -183,41 +181,31 @@ elseif(WIN32)
 	)
 endif()
 
-target_compile_definitions(ARTest PRIVATE ${ART_COMPILE_DEFINITIONS})
-
 if(APPLE)
 	if(IOS OR VISIONOS)
 		set_target_properties(
-			ARTest
-			PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING 0.0.1
+			${PROJECT_NAME}
+			PROPERTIES
+				MACOSX_BUNDLE_SHORT_VERSION_STRING 0.0.1
+				MACOSX_BUNDLE_BUNDLE_VERSION 1
 		)
-		set_target_properties(ARTest PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION 1)
 	endif()
 
-	set_target_properties(ARTest PROPERTIES MACOSX_BUNDLE TRUE)
+	string(TOLOWER "${PROJECT_NAME}" PROJECT_NAME_LOWER)
 	set_target_properties(
-		ARTest
+		${PROJECT_NAME}
 		PROPERTIES
+			MACOSX_BUNDLE TRUE
 			MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Other/Info.plist.in
-	)
-	set_target_properties(
-		ARTest
-		PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.index.artest
-	)
-
-	set_target_properties(
-		ARTest
-		PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer"
-	)
-	set_target_properties(
-		ARTest
-		PROPERTIES XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "LDF4CM9KT3"
+			MACOSX_BUNDLE_GUI_IDENTIFIER ${BUNDLE_DOMAIN}.${PROJECT_NAME_LOWER}
+			XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Automatic"
+			XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "YES"
 	)
 endif()
 
 if(MSVC)
 	set_property(
 		DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		PROPERTY VS_STARTUP_PROJECT ARTst
+		PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME}
 	)
 endif()

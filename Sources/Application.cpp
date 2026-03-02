@@ -1,8 +1,8 @@
-#include "ARTApplication.h"
+#include "Application.hpp"
 
 #include <RNVRApplicationImpl.h>
 
-#include "ARTWorld.h"
+#include "World.hpp"
 
 namespace ART
 {
