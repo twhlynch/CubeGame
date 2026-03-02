@@ -1,11 +1,5 @@
 #include "World.hpp"
 
-#include <RNJoltShape.h>
-
-#include "Hand.hpp"
-#include "PhysicsCube.hpp"
-#include "Types.hpp"
-
 namespace ART
 {
 World *World::_sharedInstance = nullptr;

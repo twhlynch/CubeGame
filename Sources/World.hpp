@@ -2,7 +2,6 @@
 
 #include <RNJoltWorld.h>
 #include <Rayne.h>
-#include <cstdint>
 
 #include "CameraManager.hpp"
 #include "Hand.hpp"
