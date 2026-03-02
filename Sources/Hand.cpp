@@ -1,9 +1,5 @@
 #include "Hand.hpp"
 
-#include <Debug/RNLogger.h>
-#include <Scene/RNEntity.h>
-#include <Scene/RNSceneNode.h>
-
 #include "PartsPicker.hpp"
 #include "PhysicsCube.hpp"
 #include "Types.hpp"
@@ -13,7 +9,7 @@ namespace ART
 {
 
 Hand::Hand(uint8_t index)
-	: _handIndex(index), _grabbedObject(nullptr)
+	: _handIndex(index), _grabbedObject(nullptr), _scaling(false)
 {
 	World *world = World::GetSharedInstance();
 
@@ -74,18 +70,17 @@ void Hand::UpdateInteractions(float delta)
 			TryGrabObject();
 		}
 
-		// carrying
+		// object interactions
 		if (_grabbedObject)
 		{
-			const RN::Vector3 handPosition = index->GetWorldPosition();
-			const RN::Quaternion handRotation = index->GetWorldRotation();
-
-			const RN::Vector3 worldOffset = handRotation.GetRotatedVector(_grabPositionOffset);
-
-			const RN::Vector3 position = handPosition + worldOffset;
-			const RN::Quaternion rotation = (handRotation * _grabRotationOffset).Normalize();
-
-			_grabbedObject->GetPhysicsBody()->SetKinematicTarget(position, rotation, delta);
+			if (_scaling)
+			{
+				UpdateScalingObject(delta);
+			}
+			else
+			{
+				UpdateMovingObject(delta);
+			}
 		}
 	}
 	else
@@ -103,6 +98,56 @@ void Hand::UpdateInteractions(float delta)
 	// next frame info
 	_previousPosition = index->GetWorldPosition();
 	_previousRotation = index->GetWorldRotation();
+}
+
+void Hand::UpdateMovingObject(float delta)
+{
+	auto *index = _indicator.at(2);
+
+	const RN::Vector3 handPosition = index->GetWorldPosition();
+	const RN::Quaternion handRotation = index->GetWorldRotation();
+
+	const RN::Vector3 worldOffset = handRotation.GetRotatedVector(_grabPositionOffset);
+
+	const RN::Vector3 position = handPosition + worldOffset;
+	const RN::Quaternion rotation = (handRotation * _grabRotationOffset).Normalize();
+
+	_grabbedObject->GetPhysicsBody()->SetKinematicTarget(position, rotation, delta);
+}
+
+void Hand::UpdateScalingObject(float /*delta*/)
+{
+	if (_handIndex == 1) { return; } // only do scaling logic once
+
+	World *world = World::GetSharedInstance();
+
+	auto *otherHand = world->GetHand(1);
+	auto *thisIndex = _indicator.at(2);
+	auto *otherIndex = otherHand->_indicator.at(2);
+
+	const RN::Vector3 p0 = thisIndex->GetWorldPosition();
+	const RN::Vector3 p1 = otherIndex->GetWorldPosition();
+
+	// scale
+	const float currentDistance = (p1 - p0).GetLength();
+	const float scaleFactor = currentDistance / _initialHandDistance;
+
+	const RN::Vector3 scale = _initialObjectScale * scaleFactor;
+
+	// scaled local offsets
+	const RN::Vector3 scaledLocal0 = _initialGrabLocal0 * scaleFactor;
+	const RN::Vector3 scaledLocal1 = _initialGrabLocal1 * scaleFactor;
+
+	const RN::Quaternion objectRotation = _grabbedObject->GetWorldRotation();
+	const RN::Vector3 worldOffset0 = objectRotation.GetRotatedVector(scaledLocal0);
+	const RN::Vector3 worldOffset1 = objectRotation.GetRotatedVector(scaledLocal1);
+
+	// position between anchors
+	const RN::Vector3 position = ((p0 - worldOffset0) + (p1 - worldOffset1)) / 2.0f;
+
+	// apply
+	_grabbedObject->SetWorldPosition(position);
+	_grabbedObject->SetScale(scale);
 }
 
 void Hand::UpdatePartsPicker(float /*delta*/)
@@ -187,7 +232,6 @@ void Hand::TryGrabObject()
 		if (!info.node) { continue; }
 		auto *cube = info.node->Downcast<PhysicsCube>();
 		if (!cube) { continue; }
-		if (cube == world->GetHand(1 - _handIndex)->GetGrabbedObject()) { continue; }
 
 		GrabObject(cube);
 		return;
@@ -212,6 +256,8 @@ void Hand::TryGrabObject()
 
 void Hand::GrabObject(PhysicsCube *object)
 {
+	World *world = World::GetSharedInstance();
+
 	auto *index = _indicator.at(2);
 	_grabbedObject = SafeRetain(object);
 
@@ -224,22 +270,73 @@ void Hand::GrabObject(PhysicsCube *object)
 	_grabRotationOffset = handRotation.GetInverse() * objectRotation;
 	_grabPositionOffset = handRotation.GetInverse().GetRotatedVector(objectPosition - handPosition);
 
-	auto *physicsBody = _grabbedObject->GetPhysicsBody();
-	physicsBody->SetEnableKinematic(true);
-	physicsBody->SetEnableGravity(false);
+	auto *otherHand = world->GetHand(1 - _handIndex);
+
+	if (object == otherHand->GetGrabbedObject())
+	{
+		_scaling = true;
+		otherHand->_scaling = true;
+
+		auto *thisIndex = _indicator.at(2);
+		auto *otherIndex = otherHand->_indicator.at(2);
+		auto *leftHand = world->GetHand(0); // store values in left hand
+
+		const RN::Vector3 p0 = thisIndex->GetWorldPosition();
+		const RN::Vector3 p1 = otherIndex->GetWorldPosition();
+
+		const RN::Vector3 objectPosition = object->GetWorldPosition();
+		const RN::Quaternion objectRotation = object->GetWorldRotation();
+		const RN::Quaternion invRotation = objectRotation.GetInverse();
+
+		// object local anchors
+		leftHand->_initialGrabLocal0 = invRotation.GetRotatedVector(p0 - objectPosition);
+		leftHand->_initialGrabLocal1 = invRotation.GetRotatedVector(p1 - objectPosition);
+
+		// base values
+		leftHand->_initialHandDistance = (p1 - p0).GetLength();
+		leftHand->_initialObjectScale = object->GetScale();
+
+		// remove physics
+		_grabbedObject->StartManipulating();
+	}
+	else
+	{
+		// disable physics
+		_grabbedObject->Grab();
+	}
 }
 
 void Hand::DropObject()
 {
 	if (!_grabbedObject) { return; }
 
-	auto *physicsBody = _grabbedObject->GetPhysicsBody();
+	World *world = World::GetSharedInstance();
 
-	physicsBody->SetEnableKinematic(false);
-	physicsBody->SetEnableGravity(true);
+	if (_scaling)
+	{
+		auto *otherHand = world->GetHand(1 - _handIndex);
+		auto *index = otherHand->_indicator.at(2);
 
-	physicsBody->SetLinearVelocity(_linearVelocity);
-	physicsBody->SetAngularVelocity(_angularVelocity);
+		_scaling = false;
+		otherHand->_scaling = false;
+
+		// resetup physics
+		_grabbedObject->StopManipulating();
+
+		// update other hand offsets
+		const RN::Vector3 handPosition = index->GetWorldPosition();
+		const RN::Quaternion handRotation = index->GetWorldRotation();
+
+		const RN::Vector3 objectPosition = _grabbedObject->GetWorldPosition();
+		const RN::Quaternion objectRotation = _grabbedObject->GetWorldRotation();
+
+		otherHand->_grabRotationOffset = handRotation.GetInverse() * objectRotation;
+		otherHand->_grabPositionOffset = handRotation.GetInverse().GetRotatedVector(objectPosition - handPosition);
+	}
+	else
+	{
+		_grabbedObject->Throw(_linearVelocity, _angularVelocity);
+	}
 
 	SafeRelease(_grabbedObject);
 }
