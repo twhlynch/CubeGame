@@ -5,7 +5,6 @@
 			{
 				"name": "main_vertex",
 				"type": "vertex",
-
 				"signature": {
 					"options": ["RN_UV0", "RN_COLOR", "RN_USE_MULTIVIEW"]
 				}
@@ -13,7 +12,6 @@
 			{
 				"name": "main_fragment",
 				"type": "fragment",
-
 				"signature": {
 					"options": ["RN_UV0", "RN_COLOR"]
 				}

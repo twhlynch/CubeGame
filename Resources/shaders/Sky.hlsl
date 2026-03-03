@@ -15,7 +15,7 @@ cbuffer fragmentUniforms
 
 struct InputVertex
 {
-	[[vk::location(0)]] float3 position : POSITION;
+	float3 position : POSITION;
 
 #if RN_USE_MULTIVIEW
 	uint viewIndex : SV_VIEWID;

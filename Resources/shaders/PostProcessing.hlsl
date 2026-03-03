@@ -9,8 +9,8 @@ cbuffer vertexUniforms
 
 struct InputVertex
 {
-	[[vk::location(0)]] float3 position : POSITION;
-	[[vk::location(5)]] float2 texCoords : TEXCOORD0;
+	float3 position : POSITION;
+	float2 texCoords : TEXCOORD0;
 };
 
 struct FragmentVertex

@@ -11,11 +11,11 @@
 #endif
 
 #if RN_UV0
-[[vk::binding(3)]] SamplerState linearRepeatSampler : register(s0);
-[[vk::binding(4)]] Texture2D texture0 : register(t0);
+[[vk::binding(2)]] SamplerState linearRepeatSampler;
+[[vk::binding(3)]] Texture2D texture0;
 #endif
 
-[[vk::binding(1)]] cbuffer vertexUniforms : register(b0)
+[[vk::binding(0)]] cbuffer vertexUniforms
 {
 	matrix modelMatrix;
 
@@ -29,26 +29,26 @@
 	float4 diffuseColor;
 	
 	float3x3 normalMatrix;
+};
+
+[[vk::binding(1)]] cbuffer fragmentUniforms
+{
+	float4 cameraAmbientColor;
 
 	float3 cameraPosition;
 };
 
-[[vk::binding(2)]] cbuffer fragmentUniforms : register(b1)
-{
-	float4 cameraAmbientColor;
-};
-
 struct InputVertex
 {
-	[[vk::location(0)]] float3 position : POSITION;
-	[[vk::location(1)]] float3 normal : NORMAL;
+	float3 position : POSITION;
+	float3 normal : NORMAL;
 
 #if RN_COLOR
-	[[vk::location(3)]] float4 color : COLOR;
+	float4 color : COLOR;
 #endif
 
 #if RN_UV0
-	[[vk::location(5)]] float2 texCoords : TEXCOORD0;
+	float2 texCoords : TEXCOORD0;
 #endif
 
 #if RN_USE_MULTIVIEW
