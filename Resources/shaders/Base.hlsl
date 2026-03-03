@@ -6,14 +6,6 @@
 #define RN_COLOR 0
 #endif
 
-#ifndef RN_ANIMATIONS
-#define RN_ANIMATIONS 0
-#endif
-
-#ifndef RN_MAX_BONES
-#define RN_MAX_BONES 100
-#endif
-
 #if RN_UV0
 [[vk::binding(3)]] SamplerState linearRepeatSampler : register(s0);
 [[vk::binding(4)]] Texture2D texture0 : register(t0);
@@ -23,10 +15,6 @@
 {
 	matrix modelMatrix;
 	matrix modelViewProjectionMatrix;
-
-#if RN_ANIMATIONS
-	matrix boneMatrices[RN_MAX_BONES];
-#endif
 
 	float4 ambientColor;
 	float4 diffuseColor;
@@ -49,11 +37,6 @@ struct InputVertex
 #if RN_UV0
 	[[vk::location(5)]] float2 texCoords : TEXCOORD0;
 #endif
-
-#if RN_ANIMATIONS
-	[[vk::location(7)]] float4 boneWeights : BONEWEIGHTS;
-	[[vk::location(8)]] float4 boneIndices : BONEINDICES;
-#endif
 };
 
 struct FragmentVertex
@@ -66,21 +49,6 @@ struct FragmentVertex
 #endif
 };
 
-#if RN_ANIMATIONS
-float4 getAnimatedPosition(float4 position, float4 weights, float4 indices)
-{
-	float4 pos1 = mul(boneMatrices[int(indices.x)], position);
-	float4 pos2 = mul(boneMatrices[int(indices.y)], position);
-	float4 pos3 = mul(boneMatrices[int(indices.z)], position);
-	float4 pos4 = mul(boneMatrices[int(indices.w)], position);
-
-	float4 pos = pos1 * weights.x + pos2 * weights.y + pos3 * weights.z + pos4 * weights.w;
-	pos.w = position.w;
-
-	return pos;
-}
-#endif
-
 FragmentVertex main_vertex(InputVertex vert)
 {
 	FragmentVertex result;
@@ -89,13 +57,8 @@ FragmentVertex main_vertex(InputVertex vert)
 	result.texCoords = vert.texCoords;
 #endif
 
-#if RN_ANIMATIONS
-	float4 position = getAnimatedPosition(float4(vert.position, 1.0), vert.boneWeights, vert.boneIndices);
-	float4 normal = getAnimatedPosition(float4(vert.normal, 0.0), vert.boneWeights, vert.boneIndices);
-#else
 	float4 position = float4(vert.position, 1.0);
 	float4 normal = float4(vert.normal, 0.0);
-#endif
 
 	result.position = mul(modelViewProjectionMatrix, position);
 
@@ -107,7 +70,6 @@ FragmentVertex main_vertex(InputVertex vert)
 
 	return result;
 }
-
 
 half4 main_fragment(FragmentVertex vert) : SV_TARGET
 {
