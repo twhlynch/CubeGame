@@ -166,7 +166,7 @@ void CameraManager::ResetPositionAndRotation()
 
 	if (_vrCamera)
 	{
-		_vrCamera->SetWorldPosition(RN::Vector3(0.0f, -1.8f, 0.0f));
+		_vrCamera->SetWorldPosition(RN::Vector3(0.0f, 0.0f, 0.0f));
 		_vrCamera->SetWorldRotation(RN::Quaternion());
 	}
 	else if (_headCamera)

@@ -183,7 +183,7 @@ void World::LoadLevel()
 	auto *groundModel = AssignShader(RN::Model::WithCube(RN::Color::ClearColor()), Types::MaterialType::MaterialDefault);
 	auto *groundEntity = new RN::Entity(groundModel);
 	groundEntity->SetScale(RN::Vector3(50.0f, 0.1f, 50.0f));
-	groundEntity->SetPosition(RN::Vector3(0.0f, -1.5f, 0.0f));
+	groundEntity->SetPosition(RN::Vector3(0.0f, 0.0f, 0.0f));
 
 	auto *groundMaterial = new RN::JoltMaterial();
 	auto *groundShape = RN::JoltCompoundShape::WithModel(groundModel, groundMaterial->Autorelease(), groundEntity->GetScale(), true);
