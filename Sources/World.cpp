@@ -129,6 +129,9 @@ RN::Model *World::AssignShader(RN::Model *model, Types::MaterialType materialTyp
 					RN::Shader::Options *shaderOptions = RN::Shader::Options::WithMesh(lodStage->GetMeshAtIndex(i));
 					material->SetVertexShader(shaderLibrary->GetShaderWithName(RNCSTR("main_vertex"), shaderOptions));
 					material->SetFragmentShader(shaderLibrary->GetShaderWithName(RNCSTR("main_fragment"), shaderOptions));
+					shaderOptions->EnableMultiview();
+					material->SetVertexShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("main_vertex"), shaderOptions), RN::Shader::UsageHint::Multiview);
+					material->SetFragmentShader(GetShaderLibrary()->GetShaderWithName(RNCSTR("main_fragment"), shaderOptions), RN::Shader::UsageHint::Multiview);
 					break;
 				}
 		}
