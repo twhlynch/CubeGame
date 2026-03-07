@@ -30,6 +30,11 @@
 			"name": "com.oculus.permission.HAND_TRACKING"
 		},
 		{
+			"type": "metadata",
+			"name": "com.oculus.handtracking.frequency",
+			"value": "HIGH"
+		},
+		{
 			"type": "feature",
 			"name": "oculus.software.handtracking"
 		}
