@@ -24,7 +24,7 @@ PartsPicker::PartsPicker()
 	};
 
 	static auto *material = new RN::JoltMaterial();
-	auto *shape = RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease());
+	auto *shape = RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease(), scale);
 
 	constexpr float centerOffset = ((static_cast<float>(count) / 2.0f) * gap) - (gap / 2.0f);
 

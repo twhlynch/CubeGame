@@ -21,7 +21,7 @@ PhysicsCube::PhysicsCube(RN::Model *model) : RN::Entity(model)
 void PhysicsCube::CreatePhysicsBody()
 {
 	auto *material = new RN::JoltMaterial();
-	auto *shape = RN::JoltBoxShape::WithHalfExtents(GetScale(), material->Autorelease());
+	auto *shape = RN::JoltBoxShape::WithHalfExtents(GetScale(), material->Autorelease(), GetScale().GetMin());
 
 	_physicsBody = RN::JoltDynamicBody::WithShape(shape, mass);
 	_physicsBody->SetCollisionFilter(Types::CollisionGrabbable, Types::CollisionLevel | Types::CollisionGrabbable | Types::CollisionTest);
