@@ -1,7 +1,7 @@
 #include "Hand.hpp"
 
 #include "PartsPicker.hpp"
-#include "PhysicsCube.hpp"
+#include "PhysicsObjects.hpp"
 #include "Types.hpp"
 #include "World.hpp"
 
@@ -231,36 +231,38 @@ void Hand::TryGrabObject()
 	World *world = World::GetSharedInstance();
 	auto *index = _indicator.at(2);
 
-	// get colliding cube
-	auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionGrabbable);
+	// get colliding object
+	auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionGrabbable | Types::CollisionGrabbing);
 	for (const auto &info : overlaps)
 	{
 		if (!info.node) { continue; }
-		auto *cube = info.node->Downcast<PhysicsCube>();
-		if (!cube) { continue; }
+		auto *object = info.node->Downcast<PhysicsGroup>();
+		if (!object) { continue; }
 
-		GrabObject(cube);
+		GrabObject(object);
 		return;
 	}
 
-	// get parts menu cube
+	// get parts menu object
 	overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionPartPicker);
 	for (const auto &info : overlaps)
 	{
 		if (!info.node) { continue; }
-		auto *cube = info.node->Downcast<RN::Entity>();
-		if (!cube) { continue; }
+		auto *object = info.node->Downcast<RN::Entity>();
+		if (!object) { continue; }
 
-		auto *physicsCube = new PhysicsCube(cube->GetModel());
-		physicsCube->SetPosition(cube->GetWorldPosition());
-		world->AddLevelNode(physicsCube->Autorelease());
+		auto *physicsCube = new PhysicsCube(object->GetModel());
+		// physicsCube->SetWorldPosition(object->GetWorldPosition()); // FIXME: triggers Jolt assert
+		auto *physicsObject = new PhysicsGroup(physicsCube);
+		physicsObject->SetWorldPosition(object->GetWorldPosition());
+		world->AddLevelNode(physicsObject->Autorelease());
 
-		GrabObject(physicsCube);
+		GrabObject(physicsObject);
 		return;
 	}
 }
 
-void Hand::GrabObject(PhysicsCube *object)
+void Hand::GrabObject(PhysicsGroup *object)
 {
 	World *world = World::GetSharedInstance();
 
@@ -317,10 +319,29 @@ void Hand::DropObject()
 	if (!_grabbedObject) { return; }
 
 	World *world = World::GetSharedInstance();
+	auto *otherHand = world->GetHand(1 - _handIndex);
+	auto *otherObject = otherHand->GetGrabbedObject();
+
+	// combining cubes
+	if (otherObject && otherObject != _grabbedObject)
+	{
+		auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_grabbedObject->GetPhysicsBody()->GetShape(), _grabbedObject->GetWorldPosition(), _grabbedObject->GetWorldRotation(), 1.0f, Types::CollisionTest, Types::CollisionGrabbing);
+		for (const auto &info : overlaps)
+		{
+			if (!info.node) { continue; }
+			auto *object = info.node->Downcast<PhysicsGroup>();
+			if (object != otherObject) { continue; }
+
+			otherObject->Merge(_grabbedObject);
+
+			// TODO: update other hand grab state and other objects manipulating state
+			SafeRelease(_grabbedObject);
+			return;
+		}
+	}
 
 	if (_scaling)
 	{
-		auto *otherHand = world->GetHand(1 - _handIndex);
 		auto *index = otherHand->_indicator.at(2);
 
 		_scaling = false;

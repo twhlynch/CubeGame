@@ -11,6 +11,7 @@ enum CollisionType
 	CollisionGrabbable = 1 << 1,
 	CollisionPartPicker = 1 << 2,
 	CollisionTest = 1 << 3,
+	CollisionGrabbing = 1 << 4,
 
 	CollisionAll = 0xffffffff
 };

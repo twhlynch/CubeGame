@@ -97,14 +97,6 @@ void World::WillUpdate(float delta)
 	{
 		Exit();
 	}
-
-	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("SPACE")))
-	{
-		static auto *model = AssignShader(RN::Model::WithCube(RN::Color::Red()), Types::MaterialType::MaterialDefault);
-		auto *cube = new PhysicsCube(model);
-		cube->SetPosition({0, 1, 0});
-		AddLevelNode(cube->Autorelease());
-	}
 }
 
 RN::Model *World::AssignShader(RN::Model *model, Types::MaterialType materialType) const

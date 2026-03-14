@@ -1,0 +1,29 @@
+#pragma once
+
+#include <RNJoltShape.h>
+#include <Rayne.h>
+
+namespace CG
+{
+
+class PhysicsObject : public RN::Entity
+{
+public:
+	PhysicsObject(RN::Model *model);
+	virtual RN::JoltShape *CreateShape() const = 0;
+
+private:
+	RNDeclareMeta(PhysicsObject);
+};
+
+class PhysicsCube : public PhysicsObject
+{
+public:
+	PhysicsCube(RN::Model *model);
+	RN::JoltShape *CreateShape() const override;
+
+private:
+	RNDeclareMeta(PhysicsCube);
+};
+
+} // namespace CG

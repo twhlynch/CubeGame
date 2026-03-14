@@ -4,7 +4,7 @@
 #include <Rayne.h>
 
 #include "PartsPicker.hpp"
-#include "PhysicsCube.hpp"
+#include "PhysicsGroup.hpp"
 
 namespace CG
 {
@@ -18,7 +18,7 @@ public:
 	void Update(float delta) override;
 
 	PartsPicker *GetPartsPicker() { return _partsPicker; }
-	PhysicsCube *GetGrabbedObject() { return _grabbedObject; }
+	PhysicsGroup *GetGrabbedObject() { return _grabbedObject; }
 	bool GetHasStartedTracking() const { return _hasStartedTracking; }
 
 private:
@@ -29,7 +29,7 @@ private:
 	void UpdateMovingObject(float delta);
 
 	void TryGrabObject();
-	void GrabObject(PhysicsCube *object);
+	void GrabObject(PhysicsGroup *object);
 	void DropObject();
 
 	uint8_t _handIndex;
@@ -57,7 +57,7 @@ private:
 	RN::Vector3 _initialGrabLocal0;
 	RN::Vector3 _initialGrabLocal1;
 
-	PhysicsCube *_grabbedObject;
+	PhysicsGroup *_grabbedObject;
 	PartsPicker *_partsPicker;
 };
 
