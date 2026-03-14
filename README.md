@@ -1,3 +1,3 @@
 # CubeGame
 
-Messing with Rayne trying to get a demo scene working in AR on quest.
+Passthrough hand physics cube game built with [Rayne](https://github.com/uberpixel/rayne/).
