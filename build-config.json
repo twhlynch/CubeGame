@@ -21,22 +21,29 @@
 	],
 	"permissions~android": [
 		{
+			"type": "permission",
+			"name": "com.oculus.permission.HAND_TRACKING",
+			"required": true
+		},
+		{
+			"type": "feature",
+			"name": "oculus.software.handtracking",
+			"required": true
+		},
+		{
 			"type": "feature",
 			"name": "com.oculus.feature.PASSTHROUGH",
 			"required": true
 		},
 		{
-			"type": "permission",
-			"name": "com.oculus.permission.HAND_TRACKING"
+			"type": "metadata",
+			"name": "com.oculus.handtracking.version",
+			"value": "V2.0"
 		},
 		{
 			"type": "metadata",
 			"name": "com.oculus.handtracking.frequency",
 			"value": "HIGH"
-		},
-		{
-			"type": "feature",
-			"name": "oculus.software.handtracking"
 		}
 	],
 	"keystore~android": "../../AndroidReleaseKeyStore",
