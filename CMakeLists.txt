@@ -139,6 +139,7 @@ rayne_copy_resources(${PROJECT_NAME} "${RESOURCES}" "${ADDITIONAL_RESOURCE_COPY_
 rayne_link_with(${PROJECT_NAME})
 rayne_use_modules(${PROJECT_NAME} RayneJolt)
 rayne_use_modules(${PROJECT_NAME} RayneVR)
+rayne_use_modules(${PROJECT_NAME} RayneUI)
 
 if(NOT APPLE)
 	rayne_use_modules(${PROJECT_NAME} RayneOpenXR)
