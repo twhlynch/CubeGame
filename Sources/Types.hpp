@@ -2,7 +2,7 @@
 
 #include <Rayne.h>
 
-namespace ART::Types
+namespace CG::Types
 {
 enum CollisionType
 {
@@ -19,4 +19,4 @@ enum class MaterialType : uint8_t
 {
 	MaterialDefault
 };
-} // namespace ART::Types
+} // namespace CG::Types

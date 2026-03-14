@@ -7,7 +7,7 @@
 #include "Hand.hpp"
 #include "Types.hpp"
 
-namespace ART
+namespace CG
 {
 class World : public RN::SceneBasic
 {
@@ -60,4 +60,4 @@ protected:
 
 	static World *_sharedInstance;
 };
-} // namespace ART
+} // namespace CG

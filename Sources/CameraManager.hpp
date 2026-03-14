@@ -3,7 +3,7 @@
 #include <RNVRCamera.h>
 #include <Rayne.h>
 
-namespace ART
+namespace CG
 {
 class CameraManager
 {
@@ -61,4 +61,4 @@ protected:
 
 	RN::VRCompositorLayer *_passthroughLayer;
 };
-} // namespace ART
+} // namespace CG

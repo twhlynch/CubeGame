@@ -2,7 +2,7 @@
 
 #include "World.hpp"
 
-namespace ART
+namespace CG
 {
 CameraManager::CameraManager() : _defaultPreviewWindowResolution(960, 540), _vrWindow(nullptr), _vrCamera(nullptr), _headCamera(nullptr), _previewCamera(nullptr), _previewWindow(nullptr), _copyEyeToScreenMaterial(nullptr), _vrDebugWindow(nullptr), _cameraTargetAmbientColor(RN::Color::Black()), _cameraTargetAmbientColorChangeRate(RN::Color::Black()), _cameraTargetAmbientColorCompletedCallback(nullptr), _cameraTargetAmbientColorIsWaitingForLastFrame(false), _resetPositionAndRotation(true), _passthroughLayer(nullptr)
 {
@@ -439,4 +439,4 @@ void CameraManager::RegeneratePipeline()
 	ClearPipeline();
 	GeneratePipeline();
 }
-} // namespace ART
+} // namespace CG

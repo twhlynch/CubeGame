@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 include(ExternalProject)
 
-project(ARTest)
+project(CubeGame)
 set(LIBRARY_NAME ${PROJECT_NAME}Lib)
 set(BUNDLE_DOMAIN com.index)
 

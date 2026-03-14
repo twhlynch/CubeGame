@@ -1,6 +1,6 @@
 import SwiftUI
 import MetalKit
-import ARTestLib
+import CubeGameLib
 
 #if os(iOS)
 @main

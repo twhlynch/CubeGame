@@ -1,5 +1,5 @@
 {
-	"RNApplication": "ARTest",
+	"RNApplication": "CubeGame",
 	"RNSearchPaths": ["./Resources"],
 	"RNModules": [
 		"Modules/RayneMetal",

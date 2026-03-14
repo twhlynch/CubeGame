@@ -4,7 +4,7 @@
 
 #include "World.hpp"
 
-namespace ART
+namespace CG
 {
 Application::Application()
 {
@@ -42,4 +42,4 @@ void Application::DidFinishLaunching(RN::Kernel *kernel)
 	auto *world = new World(GetVRWindow());
 	RN::SceneManager::GetSharedInstance()->AddScene(world->Autorelease());
 }
-} // namespace ART
+} // namespace CG

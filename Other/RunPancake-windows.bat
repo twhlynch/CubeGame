@@ -1,1 +1,1 @@
-ARTest.exe --pancake
+CubeGame.exe --pancake

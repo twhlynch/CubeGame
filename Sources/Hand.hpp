@@ -6,7 +6,7 @@
 #include "PartsPicker.hpp"
 #include "PhysicsCube.hpp"
 
-namespace ART
+namespace CG
 {
 
 class Hand : public RN::SceneNode
@@ -59,4 +59,4 @@ private:
 	PartsPicker *_partsPicker;
 };
 
-} // namespace ART
+} // namespace CG

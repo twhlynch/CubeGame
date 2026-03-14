@@ -3,7 +3,7 @@
 #include <RNJoltDynamicBody.h>
 #include <Rayne.h>
 
-namespace ART
+namespace CG
 {
 
 class PhysicsCube : public RN::Entity
@@ -25,4 +25,4 @@ private:
 	RN::JoltDynamicBody *_physicsBody;
 };
 
-} // namespace ART
+} // namespace CG

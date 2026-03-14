@@ -1,2 +1,2 @@
 cd "$(dirname "$0")"
-ARTest.app/Contents/MacOS/ARTest --vr --preview
+CubeGame.app/Contents/MacOS/CubeGame --vr --preview

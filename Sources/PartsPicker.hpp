@@ -2,7 +2,7 @@
 
 #include <Rayne.h>
 
-namespace ART
+namespace CG
 {
 
 static constexpr size_t count = 6;
@@ -21,4 +21,4 @@ private:
 	std::array<RN::Entity *, count> _cubes;
 };
 
-} // namespace ART
+} // namespace CG

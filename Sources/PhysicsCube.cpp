@@ -5,7 +5,7 @@
 
 #include "Types.hpp"
 
-namespace ART
+namespace CG
 {
 
 static constexpr float scale = 0.03f;
@@ -69,4 +69,4 @@ RN::JoltDynamicBody *PhysicsCube::GetPhysicsBody() const
 	return _physicsBody;
 }
 
-}; // namespace ART
+}; // namespace CG

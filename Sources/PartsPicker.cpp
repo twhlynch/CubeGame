@@ -3,7 +3,7 @@
 #include "Types.hpp"
 #include "World.hpp"
 
-namespace ART
+namespace CG
 {
 
 static constexpr float scale = 0.007f;
@@ -69,4 +69,4 @@ void PartsPicker::SetHidden(bool hidden)
 	}
 }
 
-} // namespace ART
+} // namespace CG

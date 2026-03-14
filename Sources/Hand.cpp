@@ -5,7 +5,7 @@
 #include "Types.hpp"
 #include "World.hpp"
 
-namespace ART
+namespace CG
 {
 
 Hand::Hand(uint8_t index)
@@ -341,4 +341,4 @@ void Hand::DropObject()
 	SafeRelease(_grabbedObject);
 }
 
-} // namespace ART
+} // namespace CG

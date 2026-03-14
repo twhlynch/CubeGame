@@ -1,2 +1,2 @@
 cd "$(dirname "$0")"
-ARTest.app/Contents/MacOS/ARTest --pancake
+CubeGame.app/Contents/MacOS/CubeGame --pancake

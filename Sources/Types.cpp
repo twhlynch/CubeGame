@@ -1,6 +1,6 @@
 #include "Types.hpp"
 
-namespace ART
+namespace CG
 {
 
 }

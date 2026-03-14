@@ -1,6 +1,6 @@
 {
-	"bundle-id": "com.index.artest",
-	"name": "ARTest",
+	"bundle-id": "com.index.cubegame",
+	"name": "CubeGame",
 	"build-directory": "Builds",
 	"release-directory": "Releases",
 	"cmake-build-type": "Release",
@@ -17,7 +17,7 @@
 		"zip",
 		"jansson",
 		"png_static",
-		"ARTest"
+		"CubeGame"
 	],
 	"permissions~android": [
 		{

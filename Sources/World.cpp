@@ -1,6 +1,6 @@
 #include "World.hpp"
 
-namespace ART
+namespace CG
 {
 World *World::_sharedInstance = nullptr;
 
@@ -227,4 +227,4 @@ void World::LoadLevel()
 
 	_physicsWorld->SetPaused(false);
 }
-} // namespace ART
+} // namespace CG

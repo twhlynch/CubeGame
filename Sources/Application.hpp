@@ -3,7 +3,7 @@
 #include <RNVRApplication.h>
 #include <Rayne.h>
 
-namespace ART
+namespace CG
 {
 class Application : public RN::VRApplication
 {
@@ -14,4 +14,4 @@ public:
 	void WillFinishLaunching(RN::Kernel *kernel) override;
 	void DidFinishLaunching(RN::Kernel *kernel) override;
 };
-} // namespace ART
+} // namespace CG
