@@ -1,5 +1,9 @@
 #include "World.hpp"
 
+#include <RNUI.h>
+
+#include "HandTrackingInfo.hpp"
+
 namespace CG
 {
 World *World::_sharedInstance = nullptr;
@@ -199,6 +203,10 @@ void World::LoadLevel()
 
 	AddLevelNode(_hands.at(0));
 	AddLevelNode(_hands.at(1));
+
+	// hand tracking info
+	auto *handTrackingInfo = new HandTrackingInfo();
+	AddLevelNode(handTrackingInfo->Autorelease());
 
 	if (!RN::Renderer::IsHeadless())
 	{
