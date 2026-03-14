@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 cd Builds/android_oculus
 ./gradlew assembleDebug installDebug
 

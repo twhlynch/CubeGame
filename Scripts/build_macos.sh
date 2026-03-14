@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 xcodebuild \
 	-project Builds/macos_independent/CubeGame.xcodeproj \
 	-scheme CubeGame \
