@@ -9,7 +9,7 @@ namespace CG
 {
 
 Hand::Hand(uint8_t index)
-	: _handIndex(index), _grabbedObject(nullptr), _scaling(false)
+	: _handIndex(index), _hasStartedTracking(false), _grabbedObject(nullptr), _scaling(false)
 {
 	World *world = World::GetSharedInstance();
 
@@ -188,6 +188,12 @@ void Hand::UpdateFingers(float /*delta*/)
 	const auto middle = hand.joints[RN::VRHandTrackingState::Joint::MiddleTip];
 	const auto ring = hand.joints[RN::VRHandTrackingState::Joint::RingTip];
 	const auto little = hand.joints[RN::VRHandTrackingState::Joint::LittleTip];
+
+	// hand.tracking doesnt seem to be accurate
+	if (!_hasStartedTracking && palm.position.GetLength() > RN::k::EpsilonFloat)
+	{
+		_hasStartedTracking = true;
+	}
 
 	// get pinch distances
 	const float indexDistance = (index.position - thumb.position).GetLength();

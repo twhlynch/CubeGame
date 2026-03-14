@@ -19,6 +19,7 @@ public:
 
 	PartsPicker *GetPartsPicker() { return _partsPicker; }
 	PhysicsCube *GetGrabbedObject() { return _grabbedObject; }
+	bool GetHasStartedTracking() const { return _hasStartedTracking; }
 
 private:
 	void UpdateFingers(float delta);
@@ -32,6 +33,7 @@ private:
 	void DropObject();
 
 	uint8_t _handIndex;
+	bool _hasStartedTracking;
 
 	std::array<RN::Entity *, 6> _indicator;
 	std::array<bool, 4> _pinching;
