@@ -74,9 +74,11 @@ FragmentVertex main_vertex(InputVertex vert)
 	FragmentVertex result;
 
 #if RN_UV0
+	// UV
 	result.texCoords = vert.texCoords;
 #endif
 
+	// position and normal
 	float4 position = float4(vert.position, 1.0);
 
 	float4 worldPosition = mul(modelMatrix, position);
@@ -91,6 +93,7 @@ FragmentVertex main_vertex(InputVertex vert)
 	result.worldPosition = worldPosition.xyz;
 	result.worldNormal = worldNormal;
 
+	// base color
 #if RN_COLOR
 	result.color = vert.color * diffuseColor * ambientColor;
 #else
@@ -102,26 +105,43 @@ FragmentVertex main_vertex(InputVertex vert)
 
 half4 main_fragment(FragmentVertex vert) : SV_TARGET
 {
+	// color
 	half4 color = vert.color;
 
 #if RN_UV0
+	// texture
 	color *= texture0.Sample(linearRepeatSampler, vert.texCoords).rgba;
 #endif
 
-	float3 sunDirection = normalize(float3(-1.0, -1.0, -1.0));
-	float3 sunColor = float3(1.0, 1.0, 1.0);
-	float shininess = 32.0;
-
+	// lighting
+	float3 lightDirection = normalize(float3(-0.4, -1.0, -0.6));
 	float3 viewDirection = normalize(cameraPosition - vert.worldPosition);
-	float3 midpoint = normalize(sunDirection + viewDirection);
+	float3 lightColor = float3(1.0, 1.0, 1.0);
 
-	float strength = saturate(dot(normalize(vert.worldNormal), midpoint));
-	float specularity = pow(strength, shininess);
+	float3 normal = normalize(vert.worldNormal);
 
-	float3 specular = sunColor * specularity;
+	// diffuse
+	float alignment = saturate(dot(normal, -lightDirection));
 
-	color.rgb += specular;
+	float3 diffuse = alignment * lightColor;
 
-	color.rgb *= cameraAmbientColor.rgb;
+	// specular
+	float specularStrength = 64.0;
+	float3 halfDirection = normalize(viewDirection - lightDirection);
+	float specularAngle = saturate(dot(normal, halfDirection));
+	float specularity = pow(specularAngle, specularStrength) * alignment;
+
+	float3 specular = specularity * lightColor;
+
+	// ambient
+	float ambientStrength = 0.4;
+
+	float3 ambient = cameraAmbientColor.rgb * ambientStrength;
+
+	// add together
+	float3 lighting = ambient + diffuse + specular;
+
+	color.rgb *= lighting;
+
 	return color;
 }
