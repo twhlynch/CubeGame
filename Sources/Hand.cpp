@@ -159,11 +159,11 @@ void Hand::UpdatePartsPicker(float /*delta*/)
 
 	if (_handIndex == 0)
 	{
-		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z > 30 || handRotation.z < -90);
+		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z > 50 || handRotation.z < -90);
 	}
 	else if (_handIndex == 1)
 	{
-		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z < -30 || handRotation.z > 90);
+		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z < -50 || handRotation.z > 90);
 	}
 }
 

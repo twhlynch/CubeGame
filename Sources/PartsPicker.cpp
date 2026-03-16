@@ -6,9 +6,9 @@
 namespace CG
 {
 
-static constexpr float scale = 0.007f;
-static constexpr float gap = 0.03f;
-static constexpr float handOffset = 0.06f;
+static constexpr float scale = 0.01f;
+static constexpr float gap = 0.04f;
+static constexpr float handOffset = 0.08f;
 
 PartsPicker::PartsPicker()
 {
