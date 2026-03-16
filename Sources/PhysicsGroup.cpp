@@ -96,7 +96,7 @@ void PhysicsGroup::CreatePhysicsBody()
 	const RN::Vector3 scale = GetScale();
 
 	_objects->Enumerate<PhysicsObject>([&](PhysicsObject *object, size_t, bool &) {
-		_shape->AddChild(object->CreateShape(), object->GetPosition() * scale, object->GetRotation() * scale);
+		_shape->AddChild(object->CreateShape(), object->GetPosition() * scale, object->GetRotation());
 	});
 
 	_body = RN::JoltDynamicBody::WithShape(_shape, _mass);
