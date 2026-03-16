@@ -3,6 +3,7 @@
 #include <RNUI.h>
 
 #include "HandTrackingInfo.hpp"
+#include "ObjectManager.hpp"
 
 namespace CG
 {
@@ -34,7 +35,8 @@ void World::Exit()
 	// RN::Kernel::GetSharedInstance()->Exit();
 }
 
-World::World(RN::VRWindow *vrWindow) : _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr})
+World::World(RN::VRWindow *vrWindow)
+	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr})
 {
 	_sharedInstance = this;
 
@@ -50,6 +52,8 @@ World::~World()
 {
 	SafeRelease(_hands.at(0));
 	SafeRelease(_hands.at(1));
+
+	delete _objectManager;
 }
 
 void World::WillBecomeActive()
@@ -66,6 +70,8 @@ void World::WillBecomeActive()
 
 	_physicsWorld = new RN::JoltWorld(RN::Vector3(0.0f, -9.81f, 0.0f));
 	AddAttachment(_physicsWorld->Autorelease());
+
+	_objectManager = new ObjectManager();
 
 	LoadLevel();
 }

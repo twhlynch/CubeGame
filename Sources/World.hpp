@@ -5,6 +5,7 @@
 
 #include "CameraManager.hpp"
 #include "Hand.hpp"
+#include "ObjectManager.hpp"
 #include "Types.hpp"
 
 namespace CG
@@ -20,10 +21,14 @@ public:
 
 	RN::JoltWorld *GetPhysicsWorld() const { return _physicsWorld; }
 	RN::ShaderLibrary *GetShaderLibrary() const { return _shaderLibrary; }
+
 	RN::VRCamera *GetVRCamera() const { return _cameraManager.GetVRCamera(); }
 	RN::Camera *GetHeadCamera() const { return _cameraManager.GetHeadCamera(); }
 	RN::Camera *GetPreviewCamera() const { return _cameraManager.GetPreviewCamera(); }
+
 	CameraManager &GetCameraManager() { return _cameraManager; }
+	ObjectManager *GetObjectManager() { return _objectManager; }
+
 	Hand *GetHand(uint8_t index) { return _hands.at(index); }
 
 	RN::Model *AssignShader(RN::Model *model, Types::MaterialType materialType) const;
@@ -44,6 +49,7 @@ protected:
 	void WillUpdate(float delta) override;
 
 	CameraManager _cameraManager;
+	ObjectManager *_objectManager;
 
 	RN::Array *_levelNodes;
 

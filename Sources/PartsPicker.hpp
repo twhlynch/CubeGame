@@ -1,24 +1,29 @@
 #pragma once
 
-#include <Rayne.h>
+#include <Objects/RNArray.h>
+#include <Scene/RNSceneNode.h>
+
+#include "Part.hpp"
+#include "PhysicsGroup.hpp"
 
 namespace CG
 {
-
-static constexpr size_t count = 6;
 
 class PartsPicker : public RN::SceneNode
 {
 public:
 	PartsPicker();
+	~PartsPicker() override;
 
 	void SetHidden(bool hidden);
 	bool GetHidden() const { return _isHidden; }
 
+	PhysicsGroup *CreatePhysicsObjectForPart(Part *part);
+
 private:
 	bool _isHidden;
 
-	std::array<RN::Entity *, count> _cubes;
+	RN::Array *_objects;
 };
 
 } // namespace CG

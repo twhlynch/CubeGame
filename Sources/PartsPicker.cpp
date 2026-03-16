@@ -1,5 +1,11 @@
 #include "PartsPicker.hpp"
 
+#include <Base/RNBase.h>
+#include <Math/RNVector.h>
+#include <Objects/RNArray.h>
+#include <Scene/RNEntity.h>
+
+#include "ObjectManager.hpp"
 #include "Types.hpp"
 #include "World.hpp"
 
@@ -10,40 +16,53 @@ static constexpr float scale = 0.01f;
 static constexpr float gap = 0.04f;
 static constexpr float handOffset = 0.08f;
 
-PartsPicker::PartsPicker()
+PartsPicker::PartsPicker() : _objects(new RN::Array())
 {
 	World *world = World::GetSharedInstance();
 
-	std::array<RN::Color, count> colors = {
-		RN::Color::Red(),
-		RN::Color::Green(),
-		RN::Color::Blue(),
-		RN::Color::Yellow(),
-		RN::Color::Black(),
-		RN::Color::White(),
-	};
-
 	static auto *material = new RN::JoltMaterial();
-	auto *shape = RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease(), scale);
+	static auto *shape = new RN::JoltBoxShape(scale, material->Autorelease(), scale);
 
-	constexpr float centerOffset = ((static_cast<float>(count) / 2.0f) * gap) - (gap / 2.0f);
+	constexpr float centerOffset = ((static_cast<float>(ObjectManager::GetColorCount()) / 2.0f) * gap) - (gap / 2.0f);
 
-	for (size_t i = 0; i < count; ++i)
+	for (size_t j = 0; j < ObjectManager::GetShapeCount(); ++j)
 	{
-		RN::Vector3 pos(0, handOffset, (static_cast<float>(i) * gap) - centerOffset);
+		for (size_t i = 0; i < ObjectManager::GetColorCount(); ++i)
+		{
+			RN::Vector3 position(
+				0,
+				(static_cast<float>(j) * gap) + handOffset,
+				(static_cast<float>(i) * gap) - centerOffset);
 
-		auto *model = world->AssignShader(RN::Model::WithCube(colors.at(i)), Types::MaterialType::MaterialDefault);
-		auto *entity = new RN::Entity(model);
-		entity->SetScale(scale);
-		entity->SetPosition(pos);
+			const size_t index = (j * ObjectManager::GetColorCount()) + i;
 
-		auto *physicsBody = RN::JoltStaticBody::WithShape(shape);
-		physicsBody->SetCollisionFilter(Types::CollisionPartPicker, Types::CollisionTest);
-		entity->AddAttachment(physicsBody);
-		_cubes.at(i) = entity;
+			auto *part = world->GetObjectManager()->CreatePartWithIndex(index);
+			part->SetScale(scale);
+			part->SetPosition(position);
+			part->SetIndex(index);
 
-		AddChild(entity->Autorelease());
+			auto *physicsBody = RN::JoltStaticBody::WithShape(shape);
+			physicsBody->SetCollisionFilter(Types::CollisionPartPicker, Types::CollisionTest);
+			part->AddAttachment(physicsBody);
+			_objects->AddObject(part);
+
+			AddChild(part);
+		}
 	}
+
+	SetHidden(true);
+}
+
+PartsPicker::~PartsPicker()
+{
+	_objects->Autorelease();
+}
+
+PhysicsGroup *PartsPicker::CreatePhysicsObjectForPart(Part *part)
+{
+	World *world = World::GetSharedInstance();
+
+	return world->GetObjectManager()->CreatePhysicsObjectWithIndex(part->GetIndex());
 }
 
 void PartsPicker::SetHidden(bool hidden)
@@ -54,18 +73,16 @@ void PartsPicker::SetHidden(bool hidden)
 	if (hidden)
 	{
 		AddFlags(RN::SceneNode::Flags::Hidden);
-		for (auto *cube : _cubes)
-		{
-			cube->AddFlags(RN::SceneNode::Flags::Hidden);
-		}
+		_objects->Enumerate<Part>([&](Part *object, size_t, bool &) {
+			object->AddFlags(RN::SceneNode::Flags::Hidden);
+		});
 	}
 	else
 	{
 		RemoveFlags(RN::SceneNode::Flags::Hidden);
-		for (auto *cube : _cubes)
-		{
-			cube->RemoveFlags(RN::SceneNode::Flags::Hidden);
-		}
+		_objects->Enumerate<Part>([&](Part *object, size_t, bool &) {
+			object->RemoveFlags(RN::SceneNode::Flags::Hidden);
+		});
 	}
 }
 

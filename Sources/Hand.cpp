@@ -1,7 +1,7 @@
 #include "Hand.hpp"
 
+#include "Part.hpp"
 #include "PartsPicker.hpp"
-#include "PhysicsObjects.hpp"
 #include "Types.hpp"
 #include "World.hpp"
 
@@ -248,16 +248,15 @@ void Hand::TryGrabObject()
 	for (const auto &info : overlaps)
 	{
 		if (!info.node) { continue; }
-		auto *object = info.node->Downcast<RN::Entity>();
-		if (!object) { continue; }
+		auto *part = info.node->Downcast<Part>();
+		if (!part) { continue; }
 
-		auto *physicsCube = new PhysicsCube(object->GetModel());
-		// physicsCube->SetWorldPosition(object->GetWorldPosition()); // FIXME: triggers Jolt assert
-		auto *physicsObject = new PhysicsGroup(physicsCube);
-		physicsObject->SetWorldPosition(object->GetWorldPosition());
-		world->AddLevelNode(physicsObject->Autorelease());
+		auto *object = _partsPicker->CreatePhysicsObjectForPart(part);
 
-		GrabObject(physicsObject);
+		object->SetWorldPosition(part->GetWorldPosition());
+		world->AddLevelNode(object->Autorelease());
+
+		GrabObject(object);
 		return;
 	}
 }
