@@ -74,7 +74,6 @@ PhysicsGroup *ObjectManager::CreatePhysicsObjectWithIndex(size_t index)
 	if (index >= 0 && index < GetColorCount())
 	{
 		auto *object = new PhysicsCube(GetModelWithIndex(index));
-		// object->SetWorldPosition(object->GetWorldPosition()); // FIXME: triggers Jolt assert
 		return new PhysicsGroup(object);
 	}
 

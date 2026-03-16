@@ -333,7 +333,6 @@ void Hand::DropObject()
 
 			otherObject->Merge(_grabbedObject);
 
-			// TODO: update other hand grab state and other objects manipulating state
 			SafeRelease(_grabbedObject);
 			return;
 		}
