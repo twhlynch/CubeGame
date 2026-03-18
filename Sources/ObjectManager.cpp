@@ -53,14 +53,14 @@ ObjectManager::~ObjectManager()
 
 RN::Model *ObjectManager::GetModelWithIndex(size_t index)
 {
-	RN_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
+	RN_DEBUG_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
 
 	return _models->GetObjectAtIndex<RN::Model>(index);
 }
 
 Part *ObjectManager::CreatePartWithIndex(size_t index)
 {
-	RN_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
+	RN_DEBUG_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
 
 	auto *model = GetModelWithIndex(index);
 	auto *part = new Part(model);
@@ -69,7 +69,7 @@ Part *ObjectManager::CreatePartWithIndex(size_t index)
 
 PhysicsGroup *ObjectManager::CreatePhysicsObjectWithIndex(size_t index)
 {
-	RN_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
+	RN_DEBUG_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
 
 	if (index >= 0 && index < GetColorCount())
 	{
