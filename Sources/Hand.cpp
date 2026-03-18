@@ -3,6 +3,7 @@
 #include <Math/RNMatrixQuaternion.h>
 #include <Math/RNVector.h>
 
+#include <RNVRTrackingState.h>
 #include <RayneConfig.h>
 
 #include "Part.hpp"
@@ -22,14 +23,16 @@ RN::Vector3 Hand::_initialGrabLocal0{};
 RN::Vector3 Hand::_initialGrabLocal1{};
 
 Hand::Hand(uint8_t index)
-	: _handIndex(index), _hasStartedTracking(false), _grabbedObject(nullptr)
+	: _handIndex(index), _hasStartedTracking(false),
+	  _grabbedObject(nullptr),
+	  _pinching({false}), _wasPinching({false})
 {
 	World *world = World::GetSharedInstance();
 
 	// small cubes to indicate hand location
 	auto *model = world->AssignShader(RN::Model::WithCube(RN::Color::Blue()), Types::MaterialType::MaterialDefault);
 
-	for (size_t i = 0; i < 6; i++)
+	for (size_t i = 0; i < Joint::_JointCount; i++)
 	{
 		auto *indicator = new RN::Entity(model);
 		indicator->SetScale(0.001f);
@@ -42,7 +45,7 @@ Hand::Hand(uint8_t index)
 
 	// parts picker
 	_partsPicker = new PartsPicker();
-	auto *palm = _indicator.at(0);
+	auto *palm = _indicator.at(Joint::Palm);
 	palm->AddChild(_partsPicker->Autorelease());
 	_partsPicker->SetWorldScale(1);
 	_partsPicker->SetRotation(RN::Vector3(0, -20, 0));
@@ -72,10 +75,10 @@ void Hand::Update(float delta)
 
 void Hand::UpdateInteractions(float delta)
 {
-	if (_pinching.at(0))
+	if (_pinching.at(Pinch::Index))
 	{
 		// pinch to grab
-		if (!_grabbedObject && !_wasPinching.at(0))
+		if (!_grabbedObject && !_wasPinching.at(Pinch::Index))
 		{
 			TryGrabObject();
 		}
@@ -161,7 +164,7 @@ void Hand::UpdatePartsPicker(float /*delta*/)
 {
 	// use the palm as the main rotation of the hand
 	// the parts picker will float above it
-	auto *palm = _indicator.at(0);
+	auto *palm = _indicator.at(Joint::Palm);
 	const auto handRotation = palm->GetWorldEulerAngle();
 
 	bool otherPickerHidden = GetOtherHand()->GetPartsPicker()->GetHidden();
@@ -194,12 +197,13 @@ void Hand::UpdateFingers(float /*delta*/)
 	_pinching = {false};
 
 	// get joint states
-	const auto palm = hand.joints[RN::VRHandTrackingState::Joint::Palm];
-	const auto thumb = hand.joints[RN::VRHandTrackingState::Joint::ThumbTip];
-	const auto index = hand.joints[RN::VRHandTrackingState::Joint::IndexTip];
-	const auto middle = hand.joints[RN::VRHandTrackingState::Joint::MiddleTip];
-	const auto ring = hand.joints[RN::VRHandTrackingState::Joint::RingTip];
-	const auto little = hand.joints[RN::VRHandTrackingState::Joint::LittleTip];
+	const auto &palm = hand.joints[Joint::Palm];
+	const auto &thumb = hand.joints[Joint::ThumbTip];
+
+	const auto &index = hand.joints[Joint::IndexTip];
+	const auto &middle = hand.joints[Joint::MiddleTip];
+	const auto &ring = hand.joints[Joint::RingTip];
+	const auto &little = hand.joints[Joint::LittleTip];
 
 	// hand.tracking doesnt seem to be accurate
 	if (!_hasStartedTracking && palm.position.GetLength() > RN::k::EpsilonFloat)
@@ -207,36 +211,27 @@ void Hand::UpdateFingers(float /*delta*/)
 		_hasStartedTracking = true;
 	}
 
-	// get pinch distances
-	const float indexDistance = (index.position - thumb.position).GetLength();
-	const float middleDistance = (middle.position - thumb.position).GetLength();
-	const float ringDistance = (ring.position - thumb.position).GetLength();
-	const float littleDistance = (little.position - thumb.position).GetLength();
-
 	// update pinching state
-	const float pinchThreshold = 0.02f; // 1 cm
+	constexpr float pinchThreshold = 0.02f; // 2 cm
 
-	const bool indexPinching = indexDistance < pinchThreshold;
-	const bool middlePinching = middleDistance < pinchThreshold;
-	const bool ringPinching = ringDistance < pinchThreshold;
-	const bool littlePinching = littleDistance < pinchThreshold;
+	const std::array<const RN::VRHandTrackingState::JointState *, Pinch::_Count> tips =
+		{&index, &middle, &ring, &little};
 
-	_pinching = {indexPinching, ringPinching, middlePinching, littlePinching};
+	for (size_t i = 0; i < Pinch::_Count; i++)
+	{
+		const auto *tip = tips[i];
+		const float distance = (tip->position - thumb.position).GetLength();
+		const bool pinching = distance < pinchThreshold;
+		_pinching[i] = pinching;
+	}
 
 	// update indicators
-	// TODO: use ALL indicators and use enum for indexing
-	_indicator.at(0)->SetPosition(palm.position);
-	_indicator.at(0)->SetRotation(palm.rotation);
-	_indicator.at(1)->SetPosition(thumb.position);
-	_indicator.at(1)->SetRotation(thumb.rotation);
-	_indicator.at(2)->SetPosition(index.position);
-	_indicator.at(2)->SetRotation(index.rotation);
-	_indicator.at(3)->SetPosition(middle.position);
-	_indicator.at(3)->SetRotation(middle.rotation);
-	_indicator.at(4)->SetPosition(ring.position);
-	_indicator.at(4)->SetRotation(ring.rotation);
-	_indicator.at(5)->SetPosition(little.position);
-	_indicator.at(5)->SetRotation(little.rotation);
+	for (size_t i = 0; i < Joint::_JointCount; i++)
+	{
+		const auto &joint = hand.joints[i];
+		_indicator.at(i)->SetPosition(joint.position);
+		_indicator.at(i)->SetRotation(joint.rotation);
+	}
 }
 
 void Hand::TryGrabObject()
@@ -393,8 +388,8 @@ Hand *Hand::GetOtherHand() const
 // pinch target is the point in between the index and thumb
 RN::Vector3 Hand::GetPinchTarget() const
 {
-	auto *index = _indicator.at(2);
-	auto *thumb = _indicator.at(1);
+	auto *index = _indicator.at(Joint::IndexTip);
+	auto *thumb = _indicator.at(Joint::ThumbTip);
 
 	const RN::Vector3 indexPosition = index->GetPosition();
 	const RN::Vector3 thumbPosition = index->GetPosition();
@@ -407,7 +402,7 @@ RN::Vector3 Hand::GetPinchTarget() const
 // pinch rotation is just based off the index
 RN::Quaternion Hand::GetPinchRotation() const
 {
-	auto *index = _indicator.at(2);
+	auto *index = _indicator.at(Joint::IndexTip);
 	return index->GetRotation();
 }
 

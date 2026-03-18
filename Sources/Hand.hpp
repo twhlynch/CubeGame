@@ -5,6 +5,7 @@
 
 #include <RNJoltCollisionObject.h>
 #include <RNJoltShape.h>
+#include <RNVRTrackingState.h>
 #include <Rayne.h>
 #include <RayneConfig.h>
 
@@ -13,6 +14,8 @@
 
 namespace CG
 {
+
+using Joint = RN::VRHandTrackingState::Joint;
 
 class Hand : public RN::SceneNode
 {
@@ -48,9 +51,18 @@ private:
 	uint8_t _handIndex;
 	bool _hasStartedTracking;
 
-	std::array<RN::Entity *, 6> _indicator;
-	std::array<bool, 4> _pinching;
-	std::array<bool, 4> _wasPinching;
+	std::array<RN::Entity *, Joint::_JointCount> _indicator;
+
+	enum Pinch : RN::uint8
+	{
+		Index,
+		Middle,
+		Ring,
+		Little,
+		_Count, // NOLINT(bugprone-reserved-identifier)
+	};
+	std::array<bool, Pinch::_Count> _pinching;
+	std::array<bool, Pinch::_Count> _wasPinching;
 
 	RN::JoltSphereShape *_intersectShape;
 
