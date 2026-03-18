@@ -1,15 +1,28 @@
 #include "Hand.hpp"
 
+#include <Math/RNMatrixQuaternion.h>
+#include <Math/RNVector.h>
+
+#include <RayneConfig.h>
+
 #include "Part.hpp"
 #include "PartsPicker.hpp"
+#include "PhysicsGroup.hpp"
+#include "PhysicsHelpers.hpp"
 #include "Types.hpp"
 #include "World.hpp"
 
 namespace CG
 {
 
+bool Hand::_scaling{};
+float Hand::_initialHandDistance{};
+RN::Vector3 Hand::_initialObjectScale{};
+RN::Vector3 Hand::_initialGrabLocal0{};
+RN::Vector3 Hand::_initialGrabLocal1{};
+
 Hand::Hand(uint8_t index)
-	: _handIndex(index), _hasStartedTracking(false), _grabbedObject(nullptr), _scaling(false)
+	: _handIndex(index), _hasStartedTracking(false), _grabbedObject(nullptr)
 {
 	World *world = World::GetSharedInstance();
 
@@ -59,9 +72,6 @@ void Hand::Update(float delta)
 
 void Hand::UpdateInteractions(float delta)
 {
-	World *world = World::GetSharedInstance();
-	auto *index = _indicator.at(2);
-
 	if (_pinching.at(0))
 	{
 		// pinch to grab
@@ -88,24 +98,25 @@ void Hand::UpdateInteractions(float delta)
 		DropObject();
 	}
 
+	const RN::Vector3 pinch = GetPinchTarget();
+	const RN::Quaternion rotation = GetPinchRotation();
+
 	// accumulate velocity
-	const RN::Vector3 linearVelocity = (index->GetWorldPosition() - _previousPosition) / delta;
-	const RN::Vector3 angularVelocity = _previousRotation.GetAngularVelocity(index->GetWorldRotation(), delta);
+	const RN::Vector3 linearVelocity = (pinch - _previousPosition) / delta;
+	const RN::Vector3 angularVelocity = _previousRotation.GetAngularVelocity(rotation, delta);
 
 	_linearVelocity = _linearVelocity * 0.1 + linearVelocity * 0.9;
 	_angularVelocity = _angularVelocity * 0.1 + angularVelocity * 0.9;
 
 	// next frame info
-	_previousPosition = index->GetWorldPosition();
-	_previousRotation = index->GetWorldRotation();
+	_previousPosition = pinch;
+	_previousRotation = rotation;
 }
 
 void Hand::UpdateMovingObject(float delta)
 {
-	auto *index = _indicator.at(2);
-
-	const RN::Vector3 handPosition = index->GetWorldPosition();
-	const RN::Quaternion handRotation = index->GetWorldRotation();
+	const RN::Vector3 handPosition = GetPinchTarget();
+	const RN::Quaternion handRotation = GetPinchRotation();
 
 	const RN::Vector3 worldOffset = handRotation.GetRotatedVector(_grabPositionOffset);
 
@@ -117,16 +128,12 @@ void Hand::UpdateMovingObject(float delta)
 
 void Hand::UpdateScalingObject(float /*delta*/)
 {
-	if (_handIndex == 1) { return; } // only do scaling logic once
+	if (!IsMainHand()) { return; } // only do scaling logic once
 
 	World *world = World::GetSharedInstance();
 
-	auto *otherHand = world->GetHand(1);
-	auto *thisIndex = _indicator.at(2);
-	auto *otherIndex = otherHand->_indicator.at(2);
-
-	const RN::Vector3 p0 = thisIndex->GetWorldPosition();
-	const RN::Vector3 p1 = otherIndex->GetWorldPosition();
+	const RN::Vector3 p0 = GetPinchTarget();
+	const RN::Vector3 p1 = GetOtherHand()->GetPinchTarget();
 
 	// scale
 	const float currentDistance = (p1 - p0).GetLength();
@@ -152,18 +159,23 @@ void Hand::UpdateScalingObject(float /*delta*/)
 
 void Hand::UpdatePartsPicker(float /*delta*/)
 {
+	// use the palm as the main rotation of the hand
+	// the parts picker will float above it
 	auto *palm = _indicator.at(0);
 	const auto handRotation = palm->GetWorldEulerAngle();
 
-	bool otherPickerHidden = World::GetSharedInstance()->GetHand(1 - _handIndex)->GetPartsPicker()->GetHidden();
+	bool otherPickerHidden = GetOtherHand()->GetPartsPicker()->GetHidden();
+
+	constexpr float minAngle = 50.0f;
+	constexpr float maxAngle = 90.0f;
 
 	if (_handIndex == 0)
 	{
-		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z > 50 || handRotation.z < -90);
+		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z > minAngle || handRotation.z < -maxAngle);
 	}
 	else if (_handIndex == 1)
 	{
-		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z < -50 || handRotation.z > 90);
+		_partsPicker->SetHidden(!otherPickerHidden || handRotation.z < -minAngle || handRotation.z > maxAngle);
 	}
 }
 
@@ -212,6 +224,7 @@ void Hand::UpdateFingers(float /*delta*/)
 	_pinching = {indexPinching, ringPinching, middlePinching, littlePinching};
 
 	// update indicators
+	// TODO: use ALL indicators and use enum for indexing
 	_indicator.at(0)->SetPosition(palm.position);
 	_indicator.at(0)->SetRotation(palm.rotation);
 	_indicator.at(1)->SetPosition(thumb.position);
@@ -229,28 +242,19 @@ void Hand::UpdateFingers(float /*delta*/)
 void Hand::TryGrabObject()
 {
 	World *world = World::GetSharedInstance();
-	auto *index = _indicator.at(2);
 
-	// get colliding object
-	auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionGrabbable | Types::CollisionGrabbing);
-	for (const auto &info : overlaps)
+	// get physics object
+	auto *object = GetPinchOverlap<PhysicsGroup>(Types::CollisionGrabbable | Types::CollisionGrabbing);
+	if (object)
 	{
-		if (!info.node) { continue; }
-		auto *object = info.node->Downcast<PhysicsGroup>();
-		if (!object) { continue; }
-
 		GrabObject(object);
 		return;
 	}
 
 	// get parts menu object
-	overlaps = world->GetPhysicsWorld()->CheckOverlap(_intersectShape, index->GetWorldPosition(), RN::Quaternion(), 1.0f, Types::CollisionTest, Types::CollisionPartPicker);
-	for (const auto &info : overlaps)
+	auto *part = GetPinchOverlap<Part>(Types::CollisionPartPicker);
+	if (part)
 	{
-		if (!info.node) { continue; }
-		auto *part = info.node->Downcast<Part>();
-		if (!part) { continue; }
-
 		auto *object = _partsPicker->CreatePhysicsObjectForPart(part);
 
 		object->SetWorldPosition(part->GetWorldPosition());
@@ -265,11 +269,10 @@ void Hand::GrabObject(PhysicsGroup *object)
 {
 	World *world = World::GetSharedInstance();
 
-	auto *index = _indicator.at(2);
 	_grabbedObject = SafeRetain(object);
 
-	const RN::Vector3 handPosition = index->GetWorldPosition();
-	const RN::Quaternion handRotation = index->GetWorldRotation();
+	const RN::Vector3 handPosition = GetPinchTarget();
+	const RN::Quaternion handRotation = GetPinchRotation();
 
 	const RN::Vector3 objectPosition = object->GetWorldPosition();
 	const RN::Quaternion objectRotation = object->GetWorldRotation();
@@ -277,31 +280,26 @@ void Hand::GrabObject(PhysicsGroup *object)
 	_grabRotationOffset = handRotation.GetInverse() * objectRotation;
 	_grabPositionOffset = handRotation.GetInverse().GetRotatedVector(objectPosition - handPosition);
 
-	auto *otherHand = world->GetHand(1 - _handIndex);
+	auto *otherHand = GetOtherHand();
 
 	if (object == otherHand->GetGrabbedObject())
 	{
 		_scaling = true;
-		otherHand->_scaling = true;
 
-		auto *thisIndex = _indicator.at(2);
-		auto *otherIndex = otherHand->_indicator.at(2);
-		auto *leftHand = world->GetHand(0); // store values in left hand
-
-		const RN::Vector3 p0 = thisIndex->GetWorldPosition();
-		const RN::Vector3 p1 = otherIndex->GetWorldPosition();
+		const RN::Vector3 p0 = GetPinchTarget();
+		const RN::Vector3 p1 = otherHand->GetPinchTarget();
 
 		const RN::Vector3 objectPosition = object->GetWorldPosition();
 		const RN::Quaternion objectRotation = object->GetWorldRotation();
 		const RN::Quaternion invRotation = objectRotation.GetInverse();
 
 		// object local anchors
-		leftHand->_initialGrabLocal0 = invRotation.GetRotatedVector(p0 - objectPosition);
-		leftHand->_initialGrabLocal1 = invRotation.GetRotatedVector(p1 - objectPosition);
+		_initialGrabLocal0 = invRotation.GetRotatedVector(p0 - objectPosition);
+		_initialGrabLocal1 = invRotation.GetRotatedVector(p1 - objectPosition);
 
 		// base values
-		leftHand->_initialHandDistance = (p1 - p0).GetLength();
-		leftHand->_initialObjectScale = object->GetScale();
+		_initialHandDistance = (p1 - p0).GetLength();
+		_initialObjectScale = object->GetScale();
 
 		// remove physics
 		_grabbedObject->StartManipulating();
@@ -318,19 +316,21 @@ void Hand::DropObject()
 	if (!_grabbedObject) { return; }
 
 	World *world = World::GetSharedInstance();
-	auto *otherHand = world->GetHand(1 - _handIndex);
+	auto *otherHand = GetOtherHand();
 	auto *otherObject = otherHand->GetGrabbedObject();
 
 	// combining cubes
 	if (otherObject && otherObject != _grabbedObject)
 	{
-		auto overlaps = world->GetPhysicsWorld()->CheckOverlap(_grabbedObject->GetPhysicsBody()->GetShape(), _grabbedObject->GetWorldPosition(), _grabbedObject->GetWorldRotation(), 1.0f, Types::CollisionTest, Types::CollisionGrabbing);
-		for (const auto &info : overlaps)
-		{
-			if (!info.node) { continue; }
-			auto *object = info.node->Downcast<PhysicsGroup>();
-			if (object != otherObject) { continue; }
+		auto *shape = _grabbedObject->GetPhysicsBody()->GetShape();
+		const RN::Vector3 position = _grabbedObject->GetWorldPosition();
+		const RN::Quaternion rotation = _grabbedObject->GetWorldRotation();
 
+		auto *object = Physics::TestOverlap<PhysicsGroup>(
+			shape, position, rotation, Types::CollisionGrabbing);
+
+		if (object && object != otherObject)
+		{
 			otherObject->Merge(_grabbedObject);
 
 			SafeRelease(_grabbedObject);
@@ -340,17 +340,14 @@ void Hand::DropObject()
 
 	if (_scaling)
 	{
-		auto *index = otherHand->_indicator.at(2);
-
 		_scaling = false;
-		otherHand->_scaling = false;
 
 		// resetup physics
 		_grabbedObject->StopManipulating();
 
 		// update other hand offsets
-		const RN::Vector3 handPosition = index->GetWorldPosition();
-		const RN::Quaternion handRotation = index->GetWorldRotation();
+		const RN::Vector3 handPosition = otherHand->GetPinchTarget();
+		const RN::Quaternion handRotation = otherHand->GetPinchRotation();
 
 		const RN::Vector3 objectPosition = _grabbedObject->GetWorldPosition();
 		const RN::Quaternion objectRotation = _grabbedObject->GetWorldRotation();
@@ -364,6 +361,54 @@ void Hand::DropObject()
 	}
 
 	SafeRelease(_grabbedObject);
+}
+
+template <class T>
+T *Hand::GetPinchOverlap(RN::uint32 mask)
+{
+	World *world = World::GetSharedInstance();
+
+	const RN::Vector3 pinch = GetPinchTarget();
+
+	// check for overlaps at the pinch position
+	auto object = Physics::TestOverlap<T>(
+		_intersectShape, pinch, RN::Quaternion(), mask);
+
+	return object;
+}
+
+bool Hand::IsMainHand() const
+{
+	constexpr RN::uint8 mainHandIndex = 0;
+	return _handIndex == mainHandIndex;
+}
+
+Hand *Hand::GetOtherHand() const
+{
+	World *world = World::GetSharedInstance();
+	auto *otherHand = world->GetHand(1 - _handIndex);
+	return otherHand;
+}
+
+// pinch target is the point in between the index and thumb
+RN::Vector3 Hand::GetPinchTarget() const
+{
+	auto *index = _indicator.at(2);
+	auto *thumb = _indicator.at(1);
+
+	const RN::Vector3 indexPosition = index->GetPosition();
+	const RN::Vector3 thumbPosition = index->GetPosition();
+
+	const RN::Vector3 midpoint = (indexPosition + thumbPosition) * 0.5f;
+
+	return midpoint;
+}
+
+// pinch rotation is just based off the index
+RN::Quaternion Hand::GetPinchRotation() const
+{
+	auto *index = _indicator.at(2);
+	return index->GetRotation();
 }
 
 } // namespace CG

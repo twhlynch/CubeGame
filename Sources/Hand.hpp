@@ -1,7 +1,12 @@
 #pragma once
 
+#include <Math/RNMatrixQuaternion.h>
+#include <Scene/RNSceneNode.h>
+
+#include <RNJoltCollisionObject.h>
 #include <RNJoltShape.h>
 #include <Rayne.h>
+#include <RayneConfig.h>
 
 #include "PartsPicker.hpp"
 #include "PhysicsGroup.hpp"
@@ -32,6 +37,14 @@ private:
 	void GrabObject(PhysicsGroup *object);
 	void DropObject();
 
+	template <class T>
+	T *GetPinchOverlap(RN::uint32 mask);
+
+	bool IsMainHand() const;
+	Hand *GetOtherHand() const;
+	RN::Vector3 GetPinchTarget() const;
+	RN::Quaternion GetPinchRotation() const;
+
 	uint8_t _handIndex;
 	bool _hasStartedTracking;
 
@@ -41,6 +54,9 @@ private:
 
 	RN::JoltSphereShape *_intersectShape;
 
+	PhysicsGroup *_grabbedObject;
+	PartsPicker *_partsPicker;
+
 	// for throwing
 	RN::Vector3 _previousPosition;
 	RN::Quaternion _previousRotation;
@@ -49,16 +65,13 @@ private:
 	RN::Vector3 _grabPositionOffset;
 	RN::Quaternion _grabRotationOffset;
 
-	// for scaling
-	bool _scaling;
-
-	float _initialHandDistance;
-	RN::Vector3 _initialObjectScale;
-	RN::Vector3 _initialGrabLocal0;
-	RN::Vector3 _initialGrabLocal1;
-
-	PhysicsGroup *_grabbedObject;
-	PartsPicker *_partsPicker;
+	// data for scaling only needs to exist
+	// once since it requires both hands
+	static bool _scaling;
+	static float _initialHandDistance;
+	static RN::Vector3 _initialObjectScale;
+	static RN::Vector3 _initialGrabLocal0;
+	static RN::Vector3 _initialGrabLocal1;
 };
 
 } // namespace CG
