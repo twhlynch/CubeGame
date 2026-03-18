@@ -17,8 +17,18 @@ namespace CG
 
 using Joint = RN::VRHandTrackingState::Joint;
 
+enum Pinch : RN::uint8
+{
+	Index,
+	Middle,
+	Ring,
+	Little,
+	_Count, // NOLINT(bugprone-reserved-identifier)
+};
+
 class Hand : public RN::SceneNode
 {
+
 public:
 	Hand(uint8_t index);
 	~Hand() override;
@@ -48,19 +58,15 @@ private:
 	RN::Vector3 GetPinchTarget() const;
 	RN::Quaternion GetPinchRotation() const;
 
+	bool IsPinching(size_t pinch) const;
+	bool WasPinching(size_t pinch) const;
+	RN::Entity *GetJointIndicator(size_t joint) const;
+
 	uint8_t _handIndex;
 	bool _hasStartedTracking;
 
 	std::array<RN::Entity *, Joint::_JointCount> _indicator;
 
-	enum Pinch : RN::uint8
-	{
-		Index,
-		Middle,
-		Ring,
-		Little,
-		_Count, // NOLINT(bugprone-reserved-identifier)
-	};
 	std::array<bool, Pinch::_Count> _pinching;
 	std::array<bool, Pinch::_Count> _wasPinching;
 

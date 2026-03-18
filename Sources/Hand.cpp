@@ -45,7 +45,7 @@ Hand::Hand(uint8_t index)
 
 	// parts picker
 	_partsPicker = new PartsPicker();
-	auto *palm = _indicator.at(Joint::Palm);
+	auto *palm = GetJointIndicator(Joint::Palm);
 	palm->AddChild(_partsPicker->Autorelease());
 	_partsPicker->SetWorldScale(1);
 	_partsPicker->SetRotation(RN::Vector3(0, -20, 0));
@@ -75,10 +75,10 @@ void Hand::Update(float delta)
 
 void Hand::UpdateInteractions(float delta)
 {
-	if (_pinching.at(Pinch::Index))
+	if (IsPinching(Pinch::Index))
 	{
 		// pinch to grab
-		if (!_grabbedObject && !_wasPinching.at(Pinch::Index))
+		if (!_grabbedObject && !WasPinching(Pinch::Index))
 		{
 			TryGrabObject();
 		}
@@ -108,8 +108,8 @@ void Hand::UpdateInteractions(float delta)
 	const RN::Vector3 linearVelocity = (pinch - _previousPosition) / delta;
 	const RN::Vector3 angularVelocity = _previousRotation.GetAngularVelocity(rotation, delta);
 
-	_linearVelocity = _linearVelocity * 0.1 + linearVelocity * 0.9;
-	_angularVelocity = _angularVelocity * 0.1 + angularVelocity * 0.9;
+	_linearVelocity = _linearVelocity.GetLerp(linearVelocity, 0.9f);
+	_angularVelocity = _angularVelocity.GetLerp(angularVelocity, 0.9f);
 
 	// next frame info
 	_previousPosition = pinch;
@@ -164,7 +164,7 @@ void Hand::UpdatePartsPicker(float /*delta*/)
 {
 	// use the palm as the main rotation of the hand
 	// the parts picker will float above it
-	auto *palm = _indicator.at(Joint::Palm);
+	auto *palm = GetJointIndicator(Joint::Palm);
 	const auto handRotation = palm->GetWorldEulerAngle();
 
 	bool otherPickerHidden = GetOtherHand()->GetPartsPicker()->GetHidden();
@@ -229,8 +229,8 @@ void Hand::UpdateFingers(float /*delta*/)
 	for (size_t i = 0; i < Joint::_JointCount; i++)
 	{
 		const auto &joint = hand.joints[i];
-		_indicator.at(i)->SetPosition(joint.position);
-		_indicator.at(i)->SetRotation(joint.rotation);
+		GetJointIndicator(i)->SetPosition(joint.position);
+		GetJointIndicator(i)->SetRotation(joint.rotation);
 	}
 }
 
@@ -388,11 +388,11 @@ Hand *Hand::GetOtherHand() const
 // pinch target is the point in between the index and thumb
 RN::Vector3 Hand::GetPinchTarget() const
 {
-	auto *index = _indicator.at(Joint::IndexTip);
-	auto *thumb = _indicator.at(Joint::ThumbTip);
+	auto *index = GetJointIndicator(Joint::IndexTip);
+	auto *thumb = GetJointIndicator(Joint::ThumbTip);
 
 	const RN::Vector3 indexPosition = index->GetPosition();
-	const RN::Vector3 thumbPosition = index->GetPosition();
+	const RN::Vector3 thumbPosition = thumb->GetPosition();
 
 	const RN::Vector3 midpoint = (indexPosition + thumbPosition) * 0.5f;
 
@@ -402,8 +402,23 @@ RN::Vector3 Hand::GetPinchTarget() const
 // pinch rotation is just based off the index
 RN::Quaternion Hand::GetPinchRotation() const
 {
-	auto *index = _indicator.at(Joint::IndexTip);
+	auto *index = GetJointIndicator(Joint::IndexTip);
 	return index->GetRotation();
+}
+
+bool Hand::IsPinching(size_t pinch) const
+{
+	return _pinching.at(pinch);
+}
+
+bool Hand::WasPinching(size_t pinch) const
+{
+	return _wasPinching.at(pinch);
+}
+
+RN::Entity *Hand::GetJointIndicator(size_t joint) const
+{
+	return _indicator.at(joint);
 }
 
 } // namespace CG
