@@ -4,6 +4,7 @@
 
 #include <RayneConfig.h>
 
+#include "MeshHelpers.hpp"
 #include "Types.hpp"
 #include "World.hpp"
 
@@ -28,18 +29,18 @@ ObjectManager::ObjectManager()
 		RN::Color::White(),
 	};
 
-	std::array<RN::Mesh *, GetShapeCount()> meshes = {
-		RN::Mesh::WithColoredCube(scale, color),
-		RN::Mesh::WithSphereMesh(scale, segments, segments, color),
+	_meshes = {
+		Mesh::CubeMesh()->Retain(),
+		Mesh::SphereMesh()->Retain(),
+		Mesh::PyramidMesh()->Retain(),
 	};
 
-	for (auto &mesh : meshes)
+	for (auto &mesh : _meshes)
 	{
 		for (const auto &diffuse : colors)
 		{
 			auto *material = RN::Material::WithShaders(nullptr, nullptr);
 			material->SetDiffuseColor(diffuse);
-			material->SetCullMode(RN::CullMode::None); // FIXME: fix Rayne Sphere mesh being inside out
 			auto *model = world->AssignShader(new RN::Model(mesh, material), Types::MaterialType::MaterialDefault);
 			_models->AddObject(model->Autorelease());
 		}
@@ -49,6 +50,11 @@ ObjectManager::ObjectManager()
 ObjectManager::~ObjectManager()
 {
 	_models->Release();
+
+	for (auto &mesh : _meshes)
+	{
+		mesh->Autorelease();
+	}
 }
 
 RN::Model *ObjectManager::GetModelWithIndex(size_t index)
@@ -83,9 +89,22 @@ PhysicsGroup *ObjectManager::CreatePhysicsObjectWithIndex(size_t index)
 		return new PhysicsGroup(object);
 	}
 
+	if (index >= GetColorCount() * 2 && index < GetColorCount() * 3)
+	{
+		auto *object = new PhysicsPyramid(GetModelWithIndex(index));
+		return new PhysicsGroup(object);
+	}
+
 	// and just in case
 	auto *object = new PhysicsCube(GetModelWithIndex(index));
 	return new PhysicsGroup(object);
+}
+
+RN::Mesh *ObjectManager::GetMeshWithIndex(size_t index)
+{
+	RN_DEBUG_ASSERT(index < GetShapeCount(), "Invalid mesh index");
+
+	return _meshes[index];
 }
 
 } // namespace CG

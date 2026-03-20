@@ -20,8 +20,12 @@ public:
 	RN::Model *GetModelWithIndex(size_t index);
 	PhysicsGroup *CreatePhysicsObjectWithIndex(size_t index);
 
-	static constexpr size_t GetShapeCount() { return 2; }
+	RN::Mesh *GetMeshWithIndex(size_t index);
+
+	static constexpr size_t GetShapeCount() { return 3; }
 	static constexpr size_t GetColorCount() { return 6; }
+
+	std::array<RN::Mesh *, 3> _meshes;
 
 private:
 	RN::Array *_models;
