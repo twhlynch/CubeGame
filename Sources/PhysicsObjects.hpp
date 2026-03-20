@@ -36,4 +36,14 @@ private:
 	RNDeclareMeta(PhysicsSphere);
 };
 
+class PhysicsPyramid : public PhysicsObject
+{
+public:
+	PhysicsPyramid(RN::Model *model);
+	RN::JoltShape *CreateShape() const override;
+
+private:
+	RNDeclareMeta(PhysicsPyramid);
+};
+
 } // namespace CG

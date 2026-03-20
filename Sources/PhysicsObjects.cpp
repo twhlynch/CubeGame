@@ -3,6 +3,9 @@
 #include <RNJoltMaterial.h>
 #include <RNJoltShape.h>
 
+#include "ObjectManager.hpp"
+#include "World.hpp"
+
 namespace CG
 {
 
@@ -34,6 +37,18 @@ RN::JoltShape *PhysicsSphere::CreateShape() const
 	auto *material = new RN::JoltMaterial();
 	const auto worldRadius = GetWorldScale().x;
 	return RN::JoltSphereShape::WithRadius(worldRadius, material->Autorelease());
+}
+
+RNDefineMeta(PhysicsPyramid, PhysicsObject);
+
+PhysicsPyramid::PhysicsPyramid(RN::Model *model) : PhysicsObject(model) {}
+
+RN::JoltShape *PhysicsPyramid::CreateShape() const
+{
+	auto *material = new RN::JoltMaterial();
+	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(2);
+	const auto worldRadius = GetWorldScale().x;
+	return RN::JoltTriangleMeshShape::WithMesh(mesh, material->Autorelease(), worldRadius);
 }
 
 }; // namespace CG
