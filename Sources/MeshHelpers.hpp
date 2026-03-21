@@ -78,10 +78,10 @@ static RN::Mesh *PyramidMesh()
 	// clang-format off
 	return MeshBuilder({
 		{ 0.0f,  size,  0.0f}, // top         0
-		{ size, -size,  size}, // front left  1
-		{-size, -size,  size}, // front right 2
-		{-size, -size, -size}, // back  right 3
-		{ size, -size, -size}, // back  left  4
+		{-size, -size,  size}, // front left  1
+		{ size, -size,  size}, // front right 2
+		{ size, -size, -size}, // back  right 3
+		{-size, -size, -size}, // back  left  4
 	}, {
 		//   a   a, b, c
 		//  ╱ ╲
@@ -90,6 +90,9 @@ static RN::Mesh *PyramidMesh()
 		0, 2, 3, // right
 		0, 3, 4, // back
 		0, 4, 1, // left
+
+		1, 4, 3, // bottom
+		3, 2, 1,
 	});
 	// clang-format on
 }
