@@ -103,6 +103,16 @@ void World::WillUpdate(float delta)
 	{
 		Exit();
 	}
+
+	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("SPACE")))
+	{
+		for (size_t i = 0; i < ObjectManager::GetShapeCount(); i++)
+		{
+			auto *object = GetObjectManager()->CreatePhysicsObjectWithIndex(i * ObjectManager::GetColorCount());
+			object->SetWorldPosition({0, 1.0f, 0});
+			AddLevelNode(object->Autorelease());
+		}
+	}
 }
 
 RN::Model *World::AssignShader(RN::Model *model, Types::MaterialType materialType) const
