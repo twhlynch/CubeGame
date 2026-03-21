@@ -10,6 +10,8 @@
 namespace CG
 {
 
+constexpr size_t shapeCount = 5;
+
 class ObjectManager
 {
 public:
@@ -22,10 +24,10 @@ public:
 
 	RN::Mesh *GetMeshWithIndex(size_t index);
 
-	static constexpr size_t GetShapeCount() { return 3; }
+	static constexpr size_t GetShapeCount() { return shapeCount; }
 	static constexpr size_t GetColorCount() { return 6; }
 
-	std::array<RN::Mesh *, 3> _meshes;
+	std::array<RN::Mesh *, shapeCount> _meshes;
 
 private:
 	RN::Array *_models;

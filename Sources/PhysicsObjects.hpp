@@ -48,4 +48,24 @@ private:
 	RNDeclareMeta(PhysicsPyramid);
 };
 
+class PhysicsRectangularPrism : public PhysicsObject
+{
+public:
+	PhysicsRectangularPrism(RN::Model *model);
+	RN::JoltShape *CreateShape() const override;
+
+private:
+	RNDeclareMeta(PhysicsRectangularPrism);
+};
+
+class PhysicsCylinder : public PhysicsObject
+{
+public:
+	PhysicsCylinder(RN::Model *model);
+	RN::JoltShape *CreateShape() const override;
+
+private:
+	RNDeclareMeta(PhysicsCylinder);
+};
+
 } // namespace CG

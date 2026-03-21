@@ -33,6 +33,8 @@ ObjectManager::ObjectManager()
 		Mesh::CubeMesh()->Retain(),
 		Mesh::SphereMesh()->Retain(),
 		Mesh::PyramidMesh()->Retain(),
+		Mesh::RectangularPrismMesh()->Retain(),
+		Mesh::CylinderMesh()->Retain(),
 	};
 
 	for (auto &mesh : _meshes)
@@ -92,6 +94,18 @@ PhysicsGroup *ObjectManager::CreatePhysicsObjectWithIndex(size_t index)
 	if (index >= GetColorCount() * 2 && index < GetColorCount() * 3)
 	{
 		auto *object = new PhysicsPyramid(GetModelWithIndex(index));
+		return new PhysicsGroup(object);
+	}
+
+	if (index >= GetColorCount() * 3 && index < GetColorCount() * 4)
+	{
+		auto *object = new PhysicsRectangularPrism(GetModelWithIndex(index));
+		return new PhysicsGroup(object);
+	}
+
+	if (index >= GetColorCount() * 4 && index < GetColorCount() * 5)
+	{
+		auto *object = new PhysicsCylinder(GetModelWithIndex(index));
 		return new PhysicsGroup(object);
 	}
 

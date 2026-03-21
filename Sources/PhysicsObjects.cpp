@@ -65,4 +65,29 @@ RN::JoltShape *PhysicsPyramid::CreateShape() const
 	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * 0.01f);
 }
 
+RNDefineMeta(PhysicsRectangularPrism, PhysicsObject);
+
+PhysicsRectangularPrism::PhysicsRectangularPrism(RN::Model *model) : PhysicsObject(model) {}
+
+RN::JoltShape *PhysicsRectangularPrism::CreateShape() const
+{
+	auto *material = new RN::JoltMaterial();
+	auto scale = GetWorldScale();
+	scale.x *= 0.5f;
+	scale.z *= 0.5f;
+	return RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease(), scale.GetMin());
+}
+
+RNDefineMeta(PhysicsCylinder, PhysicsObject);
+
+PhysicsCylinder::PhysicsCylinder(RN::Model *model) : PhysicsObject(model) {}
+
+RN::JoltShape *PhysicsCylinder::CreateShape() const
+{
+	auto *material = new RN::JoltMaterial();
+	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(4);
+	const auto worldRadius = GetWorldScale().x;
+	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * 0.01f);
+}
+
 }; // namespace CG

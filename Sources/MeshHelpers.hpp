@@ -271,8 +271,8 @@ static RN::Mesh *CylinderMesh()
 
 		triangle(a, c, b);
 		triangle(b, c, d);
-		triangle(bottom, b, a);
-		triangle(top, c, d);
+		triangle(top, d, c);
+		triangle(bottom, a, b);
 	}
 
 	return MeshBuilder(vertices, indices);
