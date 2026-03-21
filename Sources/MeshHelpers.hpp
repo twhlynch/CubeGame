@@ -12,6 +12,7 @@ namespace CG::Mesh
 using VertexAttribute = RN::Mesh::VertexAttribute;
 
 constexpr float size = 1.0f;
+constexpr float half = size * 0.5f;
 constexpr size_t segments = 12;
 
 // NOTE: only intended for simple origin centered convex shapes
@@ -129,6 +130,38 @@ static RN::Mesh *CubeMesh()
 	// clang-format on
 }
 
+static RN::Mesh *RectangularPrismMesh()
+{
+	// clang-format off
+	return MeshBuilder({
+		{ half,  size,  half}, // top    front left  0
+		{-half,  size,  half}, // top    front right 1
+		{-half,  size, -half}, // top    back  right 2
+		{ half,  size, -half}, // top    back  left  3
+		{ half, -size,  half}, // bottom front left  4
+		{-half, -size,  half}, // bottom front right 5
+		{-half, -size, -half}, // bottom back  right 6
+		{ half, -size, -half}, // bottom back  left  7
+	}, {
+		// a───b  a, c, b
+		// │ / │  b, c, d
+		// c───d
+		0, 4, 1, // front  top left
+		1, 4, 5, // front  bottom right
+		1, 5, 2, // right  top left
+		2, 5, 6, // right  bottom right
+		2, 6, 3, // back   top left
+		3, 6, 7, // back   bottom right
+		3, 7, 0, // left   top left
+		0, 7, 4, // left   bottom right
+		3, 0, 2, // top    top left
+		2, 0, 1, // top    bottom right
+		6, 4, 7, // bottom top left
+		5, 4, 6, // bottom bottom right
+	});
+	// clang-format on
+}
+
 static RN::Mesh *SphereMesh()
 {
 	std::array<RN::Vector3, segments * segments> vertices;
@@ -151,8 +184,7 @@ static RN::Mesh *SphereMesh()
 			const float x = r * std::sin(phi);
 			const float z = r * std::cos(phi);
 
-			RN::Vector3 position(x, y, z);
-			vertices[index++] = position * size;
+			vertices[index++] = RN::Vector3(x, y, z) * size;
 		}
 	}
 
@@ -172,16 +204,75 @@ static RN::Mesh *SphereMesh()
 	{
 		for (size_t j = 0; j < segments; j++)
 		{
-			size_t next = (j + 1) % segments;
+			const size_t next = (j + 1) % segments;
 
-			auto a = idx(i, j);
-			auto b = idx(i, next);
-			auto c = idx(i + 1, j);
-			auto d = idx(i + 1, next);
+			const RN::uint16 a = idx(i, j);
+			const RN::uint16 b = idx(i, next);
+			const RN::uint16 c = idx(i + 1, j);
+			const RN::uint16 d = idx(i + 1, next);
 
 			triangle(a, c, b);
 			triangle(b, c, d);
 		}
+	}
+
+	return MeshBuilder(vertices, indices);
+}
+
+static RN::Mesh *CylinderMesh()
+{
+	std::array<RN::Vector3, (segments * 2) + 2> vertices;
+	std::array<RN::uint16, (segments * 6) + (segments * 3 * 2)> indices;
+
+	size_t index = 0;
+
+	for (size_t ring = 0; ring < 2; ring++)
+	{
+		float y = (ring == 0) ? -0.5f : 0.5f;
+
+		for (size_t slice = 0; slice < segments; slice++)
+		{
+			const float frac = static_cast<float>(slice) / segments;
+			const float phi = 2.0f * RN::k::Pi * frac;
+
+			const float x = std::sin(phi);
+			const float z = std::cos(phi);
+
+			vertices[index++] = RN::Vector3(x, y, z) * size;
+		}
+	}
+
+	auto bottom = static_cast<RN::uint16>(index);
+	vertices[index++] = RN::Vector3(0.0f, -size * 0.5f, 0.0f);
+
+	auto top = static_cast<RN::uint16>(index);
+	vertices[index++] = RN::Vector3(0.0f, size * 0.5f, 0.0f);
+
+	index = 0;
+
+	auto triangle = [&](RN::uint16 a, RN::uint16 b, RN::uint16 c) {
+		indices[index++] = a;
+		indices[index++] = b;
+		indices[index++] = c;
+	};
+
+	auto idx = [&](size_t i, size_t j) {
+		return static_cast<RN::uint16>((i * segments) + j);
+	};
+
+	for (size_t j = 0; j < segments; j++)
+	{
+		const size_t next = (j + 1) % segments;
+
+		const RN::uint16 a = idx(0, j);
+		const RN::uint16 b = idx(0, next);
+		const RN::uint16 c = idx(1, j);
+		const RN::uint16 d = idx(1, next);
+
+		triangle(a, c, b);
+		triangle(b, c, d);
+		triangle(bottom, b, a);
+		triangle(top, c, d);
 	}
 
 	return MeshBuilder(vertices, indices);
