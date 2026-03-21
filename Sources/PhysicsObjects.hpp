@@ -12,6 +12,8 @@ public:
 	PhysicsObject(RN::Model *model);
 	virtual RN::JoltShape *CreateShape() const = 0;
 
+	void Update(float delta) override;
+
 private:
 	RNDeclareMeta(PhysicsObject);
 };

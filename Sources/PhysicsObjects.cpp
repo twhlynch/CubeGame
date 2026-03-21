@@ -17,6 +17,19 @@ PhysicsObject::PhysicsObject(RN::Model *model) : RN::Entity(model)
 	SetWorldScale(initialScale);
 }
 
+void PhysicsObject::Update(float delta)
+{
+	RN::Entity::Update(delta);
+
+	constexpr float voidHeight = -10.0f; // 10m
+
+	const RN::Vector3 worldPosition = GetWorldPosition();
+	if (worldPosition.y < voidHeight)
+	{
+		RemoveFromParent();
+	}
+}
+
 RNDefineMeta(PhysicsCube, PhysicsObject);
 
 PhysicsCube::PhysicsCube(RN::Model *model) : PhysicsObject(model) {}
