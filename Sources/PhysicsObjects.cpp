@@ -48,7 +48,8 @@ RN::JoltShape *PhysicsPyramid::CreateShape() const
 	auto *material = new RN::JoltMaterial();
 	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(2);
 	const auto worldRadius = GetWorldScale().x;
-	return RN::JoltTriangleMeshShape::WithMesh(mesh, material->Autorelease(), worldRadius);
+	// RN::JoltTriangleMeshShape does not work due to having sharp edges with a convex radius of zero
+	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * 0.01f);
 }
 
 }; // namespace CG
