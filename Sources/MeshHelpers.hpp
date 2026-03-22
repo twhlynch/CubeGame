@@ -275,4 +275,129 @@ static RN::Mesh *CylinderMesh()
 	return MeshBuilder(vertices, indices);
 }
 
+template <typename V, typename I, typename N>
+static RN::Mesh *MeshBuilderWithNormals(
+	const V &verticesData,
+	const I &indicesData,
+	const N &normalsData)
+{
+	auto *mesh = new RN::Mesh(
+		{
+			VertexAttribute(VertexAttribute::Feature::Vertices, RN::PrimitiveType::Vector3),
+			VertexAttribute(VertexAttribute::Feature::Normals, RN::PrimitiveType::Vector3),
+			VertexAttribute(VertexAttribute::Feature::Color0, RN::PrimitiveType::Color),
+			VertexAttribute(VertexAttribute::Feature::Indices, RN::PrimitiveType::Uint16),
+		},
+		verticesData.size(), indicesData.size());
+
+	mesh->BeginChanges();
+	auto chunk = mesh->GetChunk();
+
+	auto vertices = chunk.GetIterator<RN::Vector3>(VertexAttribute::Feature::Vertices);
+	auto normals = chunk.GetIterator<RN::Vector3>(VertexAttribute::Feature::Normals);
+	auto colors = chunk.GetIterator<RN::Color>(VertexAttribute::Feature::Color0);
+	auto indices = chunk.GetIterator<RN::uint16>(VertexAttribute::Feature::Indices);
+
+	for (size_t i = 0; i < verticesData.size(); i++)
+	{
+		*vertices++ = verticesData[i];
+		*normals++ = normalsData[i];
+		*colors++ = {1.0f, 1.0f, 1.0f};
+		*indices++ = indicesData[i];
+	}
+
+	mesh->changedVertices = true;
+	mesh->changedIndices = true;
+	mesh->EndChanges();
+
+	return mesh->Autorelease();
+}
+
+static RN::Mesh *PyramidMeshWithNormals()
+{
+	std::array<RN::Vector3, 18> vertices;
+	std::array<RN::Vector3, 18> normals;
+	std::array<RN::uint16, 18> indices;
+
+	RN::uint16 index = 0;
+
+	const RN::Vector3 top = {0.0f, size, 0.0f};
+	const RN::Vector3 fl = {-size, -size, size};
+	const RN::Vector3 fr = {size, -size, size};
+	const RN::Vector3 br = {size, -size, -size};
+	const RN::Vector3 bl = {-size, -size, -size};
+
+	auto tri = [&](const RN::Vector3 &a, const RN::Vector3 &b, const RN::Vector3 &c) {
+		const RN::Vector3 normal = (b - a).GetCrossProduct(c - a).GetNormalized();
+
+		// clang-format off
+		vertices[index] = a; normals[index] = normal; indices[index] = index; index++;
+		vertices[index] = b; normals[index] = normal; indices[index] = index; index++;
+		vertices[index] = c; normals[index] = normal; indices[index] = index; index++;
+		// clang-format on
+	};
+
+	tri(top, fl, fr); // sides
+	tri(top, fr, br);
+	tri(top, br, bl);
+	tri(top, bl, fl);
+
+	tri(fl, bl, br); // base
+	tri(br, fr, fl);
+
+	return MeshBuilderWithNormals(vertices, indices, normals);
+}
+
+static RN::Mesh *CylinderMeshWithNormals()
+{
+	constexpr size_t triCount =
+		(segments * 2) + // sides (2 tris per segment)
+		segments +		 // top
+		segments;		 // bottom
+
+	std::array<RN::Vector3, triCount * 3> vertices;
+	std::array<RN::Vector3, triCount * 3> normals;
+	std::array<RN::uint16, triCount * 3> indices;
+
+	RN::uint16 index = 0;
+
+	auto tri = [&](const RN::Vector3 &a, const RN::Vector3 &b, const RN::Vector3 &c, const RN::Vector3 &normal) {
+		// clang-format off
+		vertices[index] = a; normals[index] = normal; indices[index] = index; index++;
+		vertices[index] = c; normals[index] = normal; indices[index] = index; index++;
+		vertices[index] = b; normals[index] = normal; indices[index] = index; index++;
+		// clang-format on
+	};
+
+	auto circle = [&](float y, float angle) {
+		return RN::Vector3(std::sin(angle), y, std::cos(angle)) * size;
+	};
+
+	const RN::Vector3 topCenter = {0.0f, size * 0.5f, 0.0f};
+	const RN::Vector3 topNormal = {0.0f, 1.0f, 0.0f};
+	const RN::Vector3 bottomCenter = {0.0f, -size * 0.5f, 0.0f};
+	const RN::Vector3 bottomNormal = {0.0f, -1.0f, 0.0f};
+
+	for (size_t i = 0; i < segments; i++)
+	{
+		float a0 = (static_cast<float>(i) / static_cast<float>(segments)) * 2.0f * RN::k::Pi;
+		float a1 = static_cast<float>((i + 1) % segments) / static_cast<float>(segments) * 2.0f * RN::k::Pi;
+
+		RN::Vector3 b0 = circle(-0.5f, a0);
+		RN::Vector3 b1 = circle(-0.5f, a1);
+		RN::Vector3 t0 = circle(0.5f, a0);
+		RN::Vector3 t1 = circle(0.5f, a1);
+
+		RN::Vector3 normal = (b1 - b0).GetCrossProduct(t0 - b0).GetNormalized();
+
+		tri(b0, t0, b1, normal);
+		tri(b1, t0, t1, normal);
+
+		tri(topCenter, t1, t0, topNormal);
+		tri(bottomCenter, b0, b1, bottomNormal);
+	}
+
+	return MeshBuilderWithNormals(vertices, indices, normals);
+}
+
 } // namespace CG::Mesh

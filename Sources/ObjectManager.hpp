@@ -23,14 +23,16 @@ public:
 	PhysicsGroup *CreatePhysicsObjectWithIndex(size_t index);
 
 	RN::Mesh *GetMeshWithIndex(size_t index);
+	RN::Mesh *GetPhysicsMeshWithIndex(size_t index);
 
 	static constexpr size_t GetShapeCount() { return shapeCount; }
 	static constexpr size_t GetColorCount() { return 9; }
 
-	std::array<RN::Mesh *, shapeCount> _meshes;
-
 private:
 	RN::Array *_models;
+
+	std::array<RN::Mesh *, shapeCount> _meshes;
+	std::array<RN::Mesh *, shapeCount> _physicsMeshes;
 };
 
 } // namespace CG

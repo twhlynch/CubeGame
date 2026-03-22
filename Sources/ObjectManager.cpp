@@ -33,6 +33,14 @@ ObjectManager::ObjectManager()
 	};
 
 	_meshes = {
+		RN::Mesh::WithColoredCube(RN::Vector3(1.0f, 1.0f, 1.0f), RN::Color::White())->Retain(),
+		Mesh::SphereMesh()->Retain(),
+		Mesh::PyramidMeshWithNormals()->Retain(),
+		RN::Mesh::WithColoredCube(RN::Vector3(0.5f, 1.0f, 0.5f), RN::Color::White())->Retain(),
+		Mesh::CylinderMeshWithNormals()->Retain(),
+	};
+
+	_physicsMeshes = {
 		Mesh::CubeMesh()->Retain(),
 		Mesh::SphereMesh()->Retain(),
 		Mesh::PyramidMesh()->Retain(),
@@ -122,6 +130,13 @@ RN::Mesh *ObjectManager::GetMeshWithIndex(size_t index)
 	RN_DEBUG_ASSERT(index < GetShapeCount(), "Invalid mesh index");
 
 	return _meshes[index];
+}
+
+RN::Mesh *ObjectManager::GetPhysicsMeshWithIndex(size_t index)
+{
+	RN_DEBUG_ASSERT(index < GetShapeCount(), "Invalid mesh index");
+
+	return _physicsMeshes[index];
 }
 
 } // namespace CG
