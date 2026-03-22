@@ -39,6 +39,8 @@ public:
 	PhysicsGroup *GetGrabbedObject() { return _grabbedObject; }
 	bool GetHasStartedTracking() const { return _hasStartedTracking; }
 
+	RN::Vector3 GetFingerTipPosition(size_t index) const { return _indicator[index]->GetWorldPosition(); }
+
 private:
 	void UpdateFingers(float delta);
 	void UpdateInteractions(float delta);

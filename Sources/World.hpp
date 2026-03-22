@@ -5,6 +5,7 @@
 
 #include "CameraManager.hpp"
 #include "Hand.hpp"
+#include "Menu.hpp"
 #include "ObjectManager.hpp"
 #include "Types.hpp"
 
@@ -63,6 +64,7 @@ protected:
 	bool _isDash;
 
 	std::array<Hand *, 2> _hands;
+	Menu *_menu;
 
 	static World *_sharedInstance;
 };

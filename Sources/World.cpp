@@ -36,7 +36,7 @@ void World::Exit()
 }
 
 World::World(RN::VRWindow *vrWindow)
-	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr})
+	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr)
 {
 	_sharedInstance = this;
 
@@ -52,6 +52,8 @@ World::~World()
 {
 	SafeRelease(_hands.at(0));
 	SafeRelease(_hands.at(1));
+
+	SafeRelease(_menu);
 
 	delete _objectManager;
 }
@@ -99,9 +101,23 @@ void World::WillUpdate(float delta)
 		Exit();
 	}
 
-	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("ESC")))
+	// check for menu button
+	RN::VRCamera *vrCamera = GetVRCamera();
+	RN::VRControllerTrackingState controllerState0;
+	RN::VRControllerTrackingState controllerState1;
+	if (vrCamera)
 	{
-		Exit();
+		controllerState0 = vrCamera->GetControllerTrackingState(0);
+		controllerState1 = vrCamera->GetControllerTrackingState(1);
+	}
+	if (
+		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("ESC")) ||
+		// NOTE: this only works because meta counts the pinch menu guesture as a controller button press
+		// this does not work cross platform since that is meta specific
+		controllerState0.button[RN::VRControllerTrackingState::Button::Start] ||
+		controllerState1.button[RN::VRControllerTrackingState::Button::Start])
+	{
+		_menu->Toggle();
 	}
 
 	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("SPACE")))
@@ -212,6 +228,11 @@ void World::LoadLevel()
 
 	AddLevelNode(_hands.at(0));
 	AddLevelNode(_hands.at(1));
+
+	// menu
+	if (!_menu) { _menu = new Menu(); }
+
+	AddLevelNode(_menu);
 
 	// hand tracking info
 	auto *handTrackingInfo = new HandTrackingInfo();
