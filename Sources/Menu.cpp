@@ -57,6 +57,8 @@ void Menu::Toggle()
 
 void Menu::Update(float delta)
 {
+	RN::SceneNode::Update(delta);
+
 	World *world = World::GetSharedInstance();
 	auto *camera = world->GetHeadCamera();
 	if (!camera) { return; }
@@ -78,6 +80,9 @@ void Menu::Update(float delta)
 
 	// handle clicking
 	if (_hidden) { return; }
+
+	// FIXME: recreating menu removes buttons background color, related to how its created
+	_resetButton->SetBackgroundColor(RN::Color(1.0f, 0.0f, 0.0f, 0.8f));
 
 	_resetButton->SetIsHighlighted(false);
 
