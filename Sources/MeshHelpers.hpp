@@ -111,21 +111,21 @@ static RN::Mesh *CubeMesh()
 		{-size, -size, -size}, // bottom back  right 6
 		{ size, -size, -size}, // bottom back  left  7
 	}, {
-		// a───b  a, c, b
-		// │ / │  b, c, d
+		// a───b  a, b, c
+		// │ / │  b, d, c
 		// c───d
-		0, 4, 1, // front  top left
-		1, 4, 5, // front  bottom right
-		1, 5, 2, // right  top left
-		2, 5, 6, // right  bottom right
-		2, 6, 3, // back   top left
-		3, 6, 7, // back   bottom right
-		3, 7, 0, // left   top left
-		0, 7, 4, // left   bottom right
-		3, 0, 2, // top    top left
-		2, 0, 1, // top    bottom right
-		6, 4, 7, // bottom top left
-		5, 4, 6, // bottom bottom right
+		0, 1, 4, // front  top left
+		1, 5, 4, // front  bottom right
+		1, 2, 5, // right  top left
+		2, 6, 5, // right  bottom right
+		2, 3, 6, // back   top left
+		3, 7, 6, // back   bottom right
+		3, 0, 7, // left   top left
+		0, 4, 7, // left   bottom right
+		3, 2, 0, // top    top left
+		2, 1, 0, // top    bottom right
+		6, 7, 4, // bottom top left
+		5, 6, 4, // bottom bottom right
 	});
 	// clang-format on
 }
@@ -143,21 +143,18 @@ static RN::Mesh *RectangularPrismMesh()
 		{-half, -size, -half}, // bottom back  right 6
 		{ half, -size, -half}, // bottom back  left  7
 	}, {
-		// a───b  a, c, b
-		// │ / │  b, c, d
-		// c───d
-		0, 4, 1, // front  top left
-		1, 4, 5, // front  bottom right
-		1, 5, 2, // right  top left
-		2, 5, 6, // right  bottom right
-		2, 6, 3, // back   top left
-		3, 6, 7, // back   bottom right
-		3, 7, 0, // left   top left
-		0, 7, 4, // left   bottom right
-		3, 0, 2, // top    top left
-		2, 0, 1, // top    bottom right
-		6, 4, 7, // bottom top left
-		5, 4, 6, // bottom bottom right
+		0, 1, 4, // front  top left
+		1, 5, 4, // front  bottom right
+		1, 2, 5, // right  top left
+		2, 6, 5, // right  bottom right
+		2, 3, 6, // back   top left
+		3, 7, 6, // back   bottom right
+		3, 0, 7, // left   top left
+		0, 4, 7, // left   bottom right
+		3, 2, 0, // top    top left
+		2, 1, 0, // top    bottom right
+		6, 7, 4, // bottom top left
+		5, 6, 4, // bottom bottom right
 	});
 	// clang-format on
 }
@@ -192,8 +189,8 @@ static RN::Mesh *SphereMesh()
 
 	auto triangle = [&](RN::uint16 i0, RN::uint16 i1, RN::uint16 i2) {
 		indices[index++] = i0;
-		indices[index++] = i1;
 		indices[index++] = i2;
+		indices[index++] = i1;
 	};
 
 	auto idx = [&](size_t i, size_t j) {
@@ -252,8 +249,8 @@ static RN::Mesh *CylinderMesh()
 
 	auto triangle = [&](RN::uint16 a, RN::uint16 b, RN::uint16 c) {
 		indices[index++] = a;
-		indices[index++] = b;
 		indices[index++] = c;
+		indices[index++] = b;
 	};
 
 	auto idx = [&](size_t i, size_t j) {
