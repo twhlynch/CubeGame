@@ -8,6 +8,20 @@ Objects should have differing properties based on color. This is like mass, fric
 
 Would be a hidden list of random things that you can do, such as stack 10 objects, throw some distance, juggle, etc.
 
+### Extra tools
+
+Some kind of tools menu accessable by holding pinch in an ok guesture that pops up after a second and you can move sideways or up and down to choose an action.
+
+- separating objects
+- editing object properties
+
+### Toggle debug tools
+
+Should be added in the main menu
+
+- hand indicators
+- UI projection indicator
+
 ### Space Setup
 
 Use metas space setup & scene data apis for getting tables, walls, and so on, and give them collision.
