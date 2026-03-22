@@ -322,9 +322,9 @@ void Hand::DropObject()
 		const RN::Quaternion rotation = _grabbedObject->GetWorldRotation();
 
 		auto *object = Physics::TestOverlap<PhysicsGroup>(
-			shape, position, rotation, Types::CollisionGrabbing);
+			shape, position, rotation, Types::CollisionGrabbing, _grabbedObject);
 
-		if (object && object != otherObject)
+		if (object && object != _grabbedObject)
 		{
 			otherObject->Merge(_grabbedObject);
 

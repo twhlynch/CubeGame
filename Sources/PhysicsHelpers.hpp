@@ -15,7 +15,8 @@ T *TestOverlap(
 	RN::JoltShape *shape,
 	const RN::Vector3 &position,
 	const RN::Quaternion &rotation,
-	RN::uint32 mask)
+	RN::uint32 mask,
+	const RN::SceneNode *skip = nullptr)
 {
 	static_assert(std::is_base_of_v<RN::SceneNode, T>);
 
@@ -31,7 +32,7 @@ T *TestOverlap(
 		if (!info.node) { continue; }
 
 		auto *object = info.node->Downcast<T>();
-		if (!object) { continue; }
+		if (!object || object == skip) { continue; }
 
 		return object;
 	}
