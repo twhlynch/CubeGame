@@ -25,7 +25,7 @@ public:
 	RN::Mesh *GetMeshWithIndex(size_t index);
 
 	static constexpr size_t GetShapeCount() { return shapeCount; }
-	static constexpr size_t GetColorCount() { return 6; }
+	static constexpr size_t GetColorCount() { return 9; }
 
 	std::array<RN::Mesh *, shapeCount> _meshes;
 

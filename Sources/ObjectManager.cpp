@@ -21,12 +21,15 @@ ObjectManager::ObjectManager()
 	const auto color = RN::Color::White();
 
 	std::array<RN::Color, GetColorCount()> colors = {
-		RN::Color::Red(),
-		RN::Color::Green(),
-		RN::Color::Blue(),
-		RN::Color::Yellow(),
-		RN::Color::Black(),
-		RN::Color::White(),
+		RN::Color(1.0f, 0.0f, 0.0f), // red
+		RN::Color(0.0f, 1.0f, 0.0f), // blue
+		RN::Color(0.0f, 0.0f, 1.0f), // green
+		RN::Color(1.0f, 1.0f, 0.0f), // yellow
+		RN::Color(1.0f, 0.2f, 0.0f), // orange
+		RN::Color(0.5f, 0.0f, 1.0f), // purple
+		RN::Color(1.0f, 1.0f, 1.0f), // white
+		RN::Color(0.2f, 0.2f, 0.2f), // gray
+		RN::Color(0.0f, 0.0f, 0.0f), // black
 	};
 
 	_meshes = {
