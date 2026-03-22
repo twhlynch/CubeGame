@@ -9,6 +9,8 @@
 namespace CG
 {
 
+constexpr float convexRadiusFactor = 0.001f;
+
 RNDefineMeta(PhysicsObject, RN::Entity);
 
 PhysicsObject::PhysicsObject(RN::Model *model) : RN::Entity(model)
@@ -38,7 +40,7 @@ RN::JoltShape *PhysicsCube::CreateShape() const
 {
 	auto *material = new RN::JoltMaterial();
 	const auto worldScale = GetWorldScale();
-	return RN::JoltBoxShape::WithHalfExtents(worldScale, material->Autorelease(), worldScale.GetMin());
+	return RN::JoltBoxShape::WithHalfExtents(worldScale, material->Autorelease(), worldScale.GetMin() * convexRadiusFactor);
 }
 
 RNDefineMeta(PhysicsSphere, PhysicsObject);
@@ -62,7 +64,7 @@ RN::JoltShape *PhysicsPyramid::CreateShape() const
 	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(2);
 	const auto worldRadius = GetWorldScale().x;
 	// RN::JoltTriangleMeshShape does not work due to having sharp edges with a convex radius of zero
-	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * 0.01f);
+	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * convexRadiusFactor);
 }
 
 RNDefineMeta(PhysicsRectangularPrism, PhysicsObject);
@@ -75,7 +77,7 @@ RN::JoltShape *PhysicsRectangularPrism::CreateShape() const
 	auto scale = GetWorldScale();
 	scale.x *= 0.5f;
 	scale.z *= 0.5f;
-	return RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease(), scale.GetMin());
+	return RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease(), scale.GetMin() * convexRadiusFactor);
 }
 
 RNDefineMeta(PhysicsCylinder, PhysicsObject);
@@ -87,7 +89,7 @@ RN::JoltShape *PhysicsCylinder::CreateShape() const
 	auto *material = new RN::JoltMaterial();
 	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(4);
 	const auto worldRadius = GetWorldScale().x;
-	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * 0.01f);
+	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * convexRadiusFactor);
 }
 
 }; // namespace CG
