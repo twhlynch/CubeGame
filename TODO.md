@@ -32,6 +32,16 @@ Requires implementing support for these in Rayne.
 - https://developers.meta.com/horizon/documentation/native/android/openxr-scene-overview/
 - https://developers.meta.com/horizon/documentation/native/android/mobile-scene-api-ref/
 
+### Passthrough Depth Occlusion
+
+When a cube is partially behind your hand or a table or wall, etc, it should be partially or fully occluded.
+
+Requires implementing support for the Depth API in Rayne.
+
+- https://developers.meta.com/horizon/documentation/unity/unity-depthapi-occlusions/
+- https://registry.khronos.org/OpenXR/specs/1.1/man/html/XrEnvironmentDepthImageAcquireInfoMETA.html
+- https://registry.khronos.org/OpenXR/specs/1.1/man/html/XrEnvironmentDepthImageMETA.html
+
 ### More stable holding
 
 - Adjust pinching threshhold with size of hand. Might need a way to calibrate depending on whether constant updating works any good.
