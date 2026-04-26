@@ -48,10 +48,6 @@ Requires implementing support for the Depth API in Rayne.
 - Prevent dropping if your hand is covered by your other hand.
 - Preserve hands state when behind you / out of view.
 
-### Spawnable presets
-
-System for spawning in premade structures like a wall, a tower, some kind of house, etc
-
 ### Accurate hand hitboxes
 
 Hitbox on hands so you can punch stuff or carry something more realistically. Ideally in a way that works well with the pinching mechanic.
