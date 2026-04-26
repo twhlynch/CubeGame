@@ -4,6 +4,7 @@
 #include <Math/RNVector.h>
 #include <Scene/RNEntity.h>
 
+#include "StructureHelpers.hpp"
 #include "World.hpp"
 
 namespace CG
@@ -15,7 +16,7 @@ static constexpr float resolution = 1000.0f;
 static constexpr float fontSize = 30.0f;
 
 Menu::Menu()
-	: _window(new RN::UI::Window(RN::Rect(0.0f, 0.0f, resolution, fontSize * 2))),
+	: _window(new RN::UI::Window(RN::Rect(0.0f, 0.0f, resolution, fontSize * 10))),
 	  _hidden(true)
 {
 	_window->SetRenderGroup(1); // UI defaults to 1 << 7 not visible by the vr camera
@@ -28,21 +29,37 @@ Menu::Menu()
 	constexpr float buttonHeight = fontSize * 1.2f;
 	constexpr float buttonWidth = buttonHeight * 5.0f;
 
+	const RN::Rect centered = {
+		(resolution * 0.5f) - (buttonWidth * 0.5f),
+		fontSize - (buttonHeight * 0.5f),
+		buttonWidth,
+		buttonHeight,
+	};
+
 	_resetButton = new RN::UI::Button(RN::UI::TextAttributes(font, fontSize, RN::Color::White(), RN::UI::TextAlignmentCenter));
 	_resetButton->GetLabel()->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
 	_resetButton->GetLabel()->SetText(RNCSTR("Reset Scene"));
 	_resetButton->SetBackgroundColor(RN::Color(1.0f, 0.0f, 0.0f, 0.8f));
 	_resetButton->SetCornerRadius(fontSize);
-	// centered
-	_resetButton->SetFrame(
-		{
-			(resolution * 0.5f) - (buttonWidth * 0.5f),
-			fontSize - (buttonHeight * 0.5f),
-			buttonWidth,
-			buttonHeight,
-		});
+	_resetButton->SetFrame(centered);
+
+	_wallButton = new RN::UI::Button(RN::UI::TextAttributes(font, fontSize, RN::Color::White(), RN::UI::TextAlignmentCenter));
+	_wallButton->GetLabel()->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
+	_wallButton->GetLabel()->SetText(RNCSTR("Add Wall"));
+	_wallButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
+	_wallButton->SetCornerRadius(fontSize);
+	_wallButton->SetFrame(centered + RN::Rect(buttonWidth * -0.6f, buttonHeight * 2, 0, 0));
+
+	_towersButton = new RN::UI::Button(RN::UI::TextAttributes(font, fontSize, RN::Color::White(), RN::UI::TextAlignmentCenter));
+	_towersButton->GetLabel()->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
+	_towersButton->GetLabel()->SetText(RNCSTR("Add Towers"));
+	_towersButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
+	_towersButton->SetCornerRadius(fontSize);
+	_towersButton->SetFrame(centered + RN::Rect(buttonWidth * 0.6f, buttonHeight * 2, 0, 0));
 
 	_window->AddSubview(_resetButton->Autorelease());
+	_window->AddSubview(_wallButton->Autorelease());
+	_window->AddSubview(_towersButton->Autorelease());
 
 	_window->SetHidden(_hidden);
 	AddChild(_window->Autorelease());
@@ -83,6 +100,8 @@ void Menu::Update(float delta)
 
 	// FIXME: recreating menu removes buttons background color, related to how its created
 	_resetButton->SetBackgroundColor(RN::Color(1.0f, 0.0f, 0.0f, 0.8f));
+	_wallButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
+	_towersButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
 
 	_resetButton->SetIsHighlighted(false);
 
@@ -122,6 +141,20 @@ void Menu::HandleButtonClick()
 	if (_resetButton->GetIsHighlighted())
 	{
 		World::GetSharedInstance()->LoadLevel();
+		Toggle();
+	}
+	else if (
+		_wallButton->GetIsHighlighted() ||
+		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("1")))
+	{
+		Structures::AddWall();
+		Toggle();
+	}
+	else if (
+		_towersButton->GetIsHighlighted() ||
+		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("2")))
+	{
+		Structures::AddTowers();
 		Toggle();
 	}
 }
