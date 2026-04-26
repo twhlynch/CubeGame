@@ -36,7 +36,7 @@ void World::Exit()
 }
 
 World::World(RN::VRWindow *vrWindow)
-	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr)
+	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _wasTogglingMenu(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr)
 {
 	_sharedInstance = this;
 
@@ -110,14 +110,20 @@ void World::WillUpdate(float delta)
 		controllerState0 = vrCamera->GetControllerTrackingState(0);
 		controllerState1 = vrCamera->GetControllerTrackingState(1);
 	}
-	if (
+	bool isTogglingMenu =
 		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("ESC")) ||
 		// NOTE: this only works because meta counts the pinch menu guesture as a controller button press
 		// this does not work cross platform since that is meta specific
 		controllerState0.button[RN::VRControllerTrackingState::Button::Start] ||
-		controllerState1.button[RN::VRControllerTrackingState::Button::Start])
+		controllerState1.button[RN::VRControllerTrackingState::Button::Start];
+	if (isTogglingMenu && !_wasTogglingMenu)
 	{
+		_wasTogglingMenu = true;
 		_menu->Toggle();
+	}
+	else
+	{
+		_wasTogglingMenu = false;
 	}
 
 	if (RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("SPACE")))

@@ -62,6 +62,7 @@ protected:
 
 	bool _isPaused;
 	bool _isDash;
+	bool _wasTogglingMenu;
 
 	std::array<Hand *, 2> _hands;
 	Menu *_menu;
