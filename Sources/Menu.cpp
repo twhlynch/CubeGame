@@ -64,6 +64,12 @@ Menu::Menu()
 	_debugButton->SetCornerRadius(fontSize);
 	_debugButton->SetFrame(centered + RN::Rect(0.0f, buttonHeight * 4.0f, 0, 0));
 
+	auto *versionLabel = new RN::UI::Label(RN::UI::TextAttributes(font, fontSize * 0.4f, RN::Color::White(), RN::UI::TextAlignmentCenter));
+	versionLabel->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
+	versionLabel->SetText(RNCSTR("Cube Game v" CG_VERSION_STRING " (Build " CG_BUILD_NUMBER ")"));
+	versionLabel->SetFrame(RN::Rect(0.0f, 0.0f, resolution, fontSize * 0.6f));
+	_window->AddSubview(versionLabel->Autorelease());
+
 	_window->AddSubview(_resetButton->Autorelease());
 	_window->AddSubview(_wallButton->Autorelease());
 	_window->AddSubview(_towersButton->Autorelease());
