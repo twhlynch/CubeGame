@@ -31,7 +31,7 @@ Menu::Menu()
 
 	const RN::Rect centered = {
 		(resolution * 0.5f) - (buttonWidth * 0.5f),
-		fontSize - (buttonHeight * 0.5f),
+		(fontSize * 0.6f) + fontSize - (buttonHeight * 0.5f),
 		buttonWidth,
 		buttonHeight,
 	};
@@ -57,9 +57,17 @@ Menu::Menu()
 	_towersButton->SetCornerRadius(fontSize);
 	_towersButton->SetFrame(centered + RN::Rect(buttonWidth * 0.6f, buttonHeight * 2, 0, 0));
 
+	_debugButton = new RN::UI::Button(RN::UI::TextAttributes(font, fontSize * 0.8f, RN::Color::White(), RN::UI::TextAlignmentCenter));
+	_debugButton->GetLabel()->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
+	_debugButton->GetLabel()->SetText(RNCSTR("Toggle Debug"));
+	_debugButton->SetBackgroundColor(RN::Color(0.0f, 0.8f, 0.0f, 0.8f));
+	_debugButton->SetCornerRadius(fontSize);
+	_debugButton->SetFrame(centered + RN::Rect(0.0f, buttonHeight * 4.0f, 0, 0));
+
 	_window->AddSubview(_resetButton->Autorelease());
 	_window->AddSubview(_wallButton->Autorelease());
 	_window->AddSubview(_towersButton->Autorelease());
+	_window->AddSubview(_debugButton->Autorelease());
 
 	_window->SetHidden(_hidden);
 	AddChild(_window->Autorelease());
@@ -102,6 +110,7 @@ void Menu::Update(float delta)
 	_resetButton->SetBackgroundColor(RN::Color(1.0f, 0.0f, 0.0f, 0.8f));
 	_wallButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
 	_towersButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
+	_debugButton->SetBackgroundColor(RN::Color(0.0f, 0.8f, 0.0f, 0.8f));
 
 	_resetButton->SetIsHighlighted(false);
 
@@ -155,6 +164,11 @@ void Menu::HandleButtonClick()
 		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("2")))
 	{
 		Structures::AddTowers();
+		Toggle();
+	}
+	else if (_debugButton->GetIsHighlighted())
+	{
+		World::GetSharedInstance()->ToggleDebugMode();
 		Toggle();
 	}
 }

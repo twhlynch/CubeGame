@@ -41,6 +41,9 @@ public:
 
 	bool GetIsDash() const { return _isDash; }
 
+	bool GetDebugMode() const { return _debugMode; }
+	void ToggleDebugMode() { _debugMode = !_debugMode; }
+
 	void LoadLevel();
 
 protected:
@@ -63,6 +66,7 @@ protected:
 	bool _isPaused;
 	bool _isDash;
 	bool _wasTogglingMenu;
+	bool _debugMode;
 
 	std::array<Hand *, 2> _hands;
 	Menu *_menu;

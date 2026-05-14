@@ -36,6 +36,7 @@ Hand::Hand(uint8_t index)
 	{
 		auto *indicator = new RN::Entity(model);
 		indicator->SetScale(0.001f);
+		indicator->AddFlags(RN::SceneNode::Flags::Hidden);
 		_indicator.at(i) = indicator;
 		AddChild(indicator->Autorelease());
 	}
@@ -226,11 +227,20 @@ void Hand::UpdateFingers(float /*delta*/)
 	}
 
 	// update indicators
+	const bool showIndicators = World::GetSharedInstance()->GetDebugMode();
 	for (size_t i = 0; i < Joint::_JointCount; i++)
 	{
 		const auto &joint = hand.joints[i];
 		GetJointIndicator(i)->SetPosition(joint.position);
 		GetJointIndicator(i)->SetRotation(joint.rotation);
+		if (showIndicators)
+		{
+			GetJointIndicator(i)->RemoveFlags(RN::SceneNode::Flags::Hidden);
+		}
+		else
+		{
+			GetJointIndicator(i)->AddFlags(RN::SceneNode::Flags::Hidden);
+		}
 	}
 }
 

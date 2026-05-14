@@ -15,13 +15,6 @@ Some kind of tools menu accessable by holding pinch in an ok guesture that pops 
 - separating objects
 - editing object properties
 
-### Toggle debug tools
-
-Should be added in the main menu
-
-- hand indicators
-- UI projection indicator
-
 ### Space Setup
 
 Use metas space setup & scene data apis for getting tables, walls, and so on, and give them collision.

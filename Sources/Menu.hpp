@@ -21,6 +21,7 @@ private:
 	RN::UI::Button *_resetButton;
 	RN::UI::Button *_wallButton;
 	RN::UI::Button *_towersButton;
+	RN::UI::Button *_debugButton;
 
 	bool _hidden;
 
