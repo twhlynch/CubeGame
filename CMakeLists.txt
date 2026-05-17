@@ -116,7 +116,7 @@ elseif(IOS OR VISIONOS)
 	)
 
 	add_executable(${PROJECT_NAME} "${SOURCES_SWIFT}")
-	target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARY_NAME})
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBRARY_NAME})
 	set_target_properties(
 		${PROJECT_NAME}
 		PROPERTIES XCODE_ATTRIBUTE_SWIFT_OBJC_INTEROP_MODE objcxx
@@ -168,11 +168,11 @@ if(APPLE AND RN_BUILD_METAL_MODULE)
 	rayne_use_modules(${PROJECT_NAME} RayneMetal)
 endif()
 
-if(${RN_BUILD_CONFIGURATION} STREQUAL "oculus")
+if(RN_BUILD_CONFIGURATION STREQUAL "oculus")
 	target_compile_definitions(${PROJECT_NAME} PRIVATE -DBUILD_FOR_OCULUS)
-elseif(${RN_BUILD_CONFIGURATION} STREQUAL "steam")
+elseif(RN_BUILD_CONFIGURATION STREQUAL "steam")
 	target_compile_definitions(${PROJECT_NAME} PRIVATE -DBUILD_FOR_STEAM)
-elseif(${RN_BUILD_CONFIGURATION} STREQUAL "pico")
+elseif(RN_BUILD_CONFIGURATION STREQUAL "pico")
 	target_compile_definitions(${PROJECT_NAME} PRIVATE -DBUILD_FOR_PICO)
 elseif(WIN32)
 	add_custom_command(
