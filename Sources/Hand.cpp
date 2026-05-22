@@ -41,7 +41,7 @@ Hand::Hand(uint8_t index)
 		AddChild(indicator->Autorelease());
 	}
 
-	_intersectShape = RN::JoltSphereShape::WithRadius(0.02f, nullptr);
+	_intersectShape = RN::JoltSphereShape::WithRadius(0.02f);
 	_intersectShape->Retain();
 
 	// parts picker

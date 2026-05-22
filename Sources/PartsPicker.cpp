@@ -20,8 +20,7 @@ PartsPicker::PartsPicker() : _objects(new RN::Array())
 {
 	World *world = World::GetSharedInstance();
 
-	static auto *material = new RN::JoltMaterial();
-	static auto *shape = new RN::JoltBoxShape(scale, material->Autorelease(), scale);
+	static auto *shape = new RN::JoltBoxShape(scale, scale);
 
 	constexpr float centerOffset = ((static_cast<float>(ObjectManager::GetColorCount()) / 2.0f) * gap) - (gap / 2.0f);
 

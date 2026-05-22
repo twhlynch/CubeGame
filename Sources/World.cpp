@@ -220,8 +220,7 @@ void World::LoadLevel()
 	groundEntity->SetScale(groundScale);
 	groundEntity->SetPosition(RN::Vector3(0.0f, -(groundScale.y * 0.5f), 0.0f));
 
-	auto *groundMaterial = new RN::JoltMaterial();
-	auto *groundShape = RN::JoltBoxShape::WithHalfExtents(groundScale, groundMaterial->Autorelease(), groundScale.GetMin());
+	auto *groundShape = RN::JoltBoxShape::WithHalfExtents(groundScale, groundScale.GetMin());
 	auto *groundBody = RN::JoltStaticBody::WithShape(groundShape);
 	groundBody->SetCollisionFilter(Types::CollisionLevel, Types::CollisionAll);
 

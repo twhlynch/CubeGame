@@ -1,6 +1,5 @@
 #include "PhysicsObjects.hpp"
 
-#include <RNJoltMaterial.h>
 #include <RNJoltShape.h>
 
 #include "ObjectManager.hpp"
@@ -38,9 +37,8 @@ PhysicsCube::PhysicsCube(RN::Model *model) : PhysicsObject(model) {}
 
 RN::JoltShape *PhysicsCube::CreateShape() const
 {
-	auto *material = new RN::JoltMaterial();
 	const auto worldScale = GetWorldScale();
-	return RN::JoltBoxShape::WithHalfExtents(worldScale, material->Autorelease(), worldScale.GetMin() * convexRadiusFactor);
+	return RN::JoltBoxShape::WithHalfExtents(worldScale, worldScale.GetMin() * convexRadiusFactor);
 }
 
 RNDefineMeta(PhysicsSphere, PhysicsObject);
@@ -49,9 +47,8 @@ PhysicsSphere::PhysicsSphere(RN::Model *model) : PhysicsObject(model) {}
 
 RN::JoltShape *PhysicsSphere::CreateShape() const
 {
-	auto *material = new RN::JoltMaterial();
 	const auto worldRadius = GetWorldScale().x;
-	return RN::JoltSphereShape::WithRadius(worldRadius, material->Autorelease());
+	return RN::JoltSphereShape::WithRadius(worldRadius);
 }
 
 RNDefineMeta(PhysicsPyramid, PhysicsObject);
@@ -60,11 +57,10 @@ PhysicsPyramid::PhysicsPyramid(RN::Model *model) : PhysicsObject(model) {}
 
 RN::JoltShape *PhysicsPyramid::CreateShape() const
 {
-	auto *material = new RN::JoltMaterial();
 	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(2);
 	const auto worldRadius = GetWorldScale().x;
 	// RN::JoltTriangleMeshShape does not work due to having sharp edges with a convex radius of zero
-	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * convexRadiusFactor);
+	return RN::JoltConvexHullShape::WithMesh(mesh, worldRadius, worldRadius * convexRadiusFactor);
 }
 
 RNDefineMeta(PhysicsRectangularPrism, PhysicsObject);
@@ -73,11 +69,10 @@ PhysicsRectangularPrism::PhysicsRectangularPrism(RN::Model *model) : PhysicsObje
 
 RN::JoltShape *PhysicsRectangularPrism::CreateShape() const
 {
-	auto *material = new RN::JoltMaterial();
 	auto scale = GetWorldScale();
 	scale.x *= 0.5f;
 	scale.z *= 0.5f;
-	return RN::JoltBoxShape::WithHalfExtents(scale, material->Autorelease(), scale.GetMin() * convexRadiusFactor);
+	return RN::JoltBoxShape::WithHalfExtents(scale, scale.GetMin() * convexRadiusFactor);
 }
 
 RNDefineMeta(PhysicsCylinder, PhysicsObject);
@@ -86,10 +81,9 @@ PhysicsCylinder::PhysicsCylinder(RN::Model *model) : PhysicsObject(model) {}
 
 RN::JoltShape *PhysicsCylinder::CreateShape() const
 {
-	auto *material = new RN::JoltMaterial();
 	auto *mesh = World::GetSharedInstance()->GetObjectManager()->GetMeshWithIndex(4);
 	const auto worldRadius = GetWorldScale().x;
-	return RN::JoltConvexHullShape::WithMesh(mesh, material->Autorelease(), worldRadius, worldRadius * convexRadiusFactor);
+	return RN::JoltConvexHullShape::WithMesh(mesh, worldRadius, worldRadius * convexRadiusFactor);
 }
 
 }; // namespace CG
