@@ -8,6 +8,14 @@ Objects should have differing properties based on color. This is like mass, fric
 
 Would be a hidden list of random things that you can do, such as stack 10 objects, throw some distance, juggle, etc.
 
+### Mesh instancing
+
+Performance improvement since theres set shapes.
+
+### Bevel shapes
+
+Just to look a little nicer.
+
 ### Extra tools
 
 Some kind of tools menu accessable by holding pinch in an ok guesture that pops up after a second and you can move sideways or up and down to choose an action.
