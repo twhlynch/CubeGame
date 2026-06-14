@@ -1,5 +1,10 @@
 # Planned features
 
+### LAN web viewer
+
+Some system to broadcast the cubes and player to LAN that can be connected to
+and displayed in a 3D scene in a web view.
+
 ### Object properties
 
 Objects should have differing properties based on color. This is like mass, friction, restitution, gravity, etc.
