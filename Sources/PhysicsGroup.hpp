@@ -29,6 +29,9 @@ public:
 
 	void CreatePhysicsBody();
 
+	static void SetDefaultMass(float mass) { _defaultMass = mass; }
+	static float GetDefaultMass() { return _defaultMass; }
+
 private:
 	void UpdateCollisionFilter(bool grabbing);
 
@@ -37,6 +40,8 @@ private:
 
 	RN::Array *_objects;
 	float _mass;
+
+	static float _defaultMass;
 };
 
 } // namespace CG

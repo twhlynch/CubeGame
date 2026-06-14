@@ -8,8 +8,9 @@
 namespace CG
 {
 
-static constexpr float mass = 0.5f;
 static constexpr float friction = 0.5f;
+
+float PhysicsGroup::_defaultMass = 0.5f;
 
 PhysicsGroup::PhysicsGroup(PhysicsObject *object) : _mass(0), _body(nullptr)
 {
@@ -56,7 +57,7 @@ void PhysicsGroup::AddObject(PhysicsObject *object)
 	_objects->AddObject(object);
 	_shape->AddChild(object->CreateShape(), localPos, localRot);
 
-	_mass += mass;
+	_mass += _defaultMass;
 	if (_body) { _body->SetMass(_mass); }
 
 	object->RemoveFromParent();
