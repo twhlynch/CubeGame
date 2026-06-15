@@ -418,7 +418,7 @@ void CameraManager::GeneratePipeline()
 			_previewCamera->GetRenderPass()->SetFramebuffer(msaaFramebuffer);
 			auto *resolvePass = new RN::PostProcessingAPIStage(RN::PostProcessingAPIStage::Type::ResolveMSAA);
 			resolvePass->SetFramebuffer(_previewWindow->GetFramebuffer());
-			_previewCamera->GetRenderPass()->AddRenderPass(resolvePass->Autorelease());
+			_previewCamera->GetRenderPass()->AddFramePass(resolvePass->Autorelease());
 		}
 		else
 		{
