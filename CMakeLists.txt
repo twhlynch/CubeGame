@@ -60,6 +60,13 @@ add_subdirectory(
 	"${CMAKE_CURRENT_BINARY_DIR}/Rayne"
 )
 
+set(USE_TLS OFF CACHE BOOL "Enable TLS support" FORCE)
+set(USE_ZLIB OFF CACHE BOOL "Enable zlib support" FORCE)
+add_subdirectory(
+	"${CMAKE_CURRENT_SOURCE_DIR}/Vendor/IXWebSocket"
+	"${CMAKE_CURRENT_BINARY_DIR}/IXWebSocket"
+)
+
 if(WIN32)
 	set(CMAKE_SYSTEM_VERSION "10.0.10240.0")
 endif()
@@ -149,6 +156,11 @@ endif()
 
 if(APPLE AND RN_BUILD_METAL_MODULE)
 	rayne_use_modules(${PROJECT_NAME} RayneMetal)
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ixwebsocket)
+if(IOS OR VISIONOS)
+	target_link_libraries(${LIBRARY_NAME} PRIVATE ixwebsocket)
 endif()
 
 if(RN_BUILD_CONFIGURATION STREQUAL "oculus")

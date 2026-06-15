@@ -1,0 +1,3 @@
+[submodule "Vendor/IXWebSocket"]
+	path = Vendor/IXWebSocket
+	url = https://github.com/machinezone/IXWebSocket.git
