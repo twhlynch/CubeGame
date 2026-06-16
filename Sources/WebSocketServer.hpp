@@ -30,6 +30,8 @@ public:
 	void SetOnConnect(EventCallback cb) { _onConnect = std::move(cb); }
 	void SetOnDisconnect(EventCallback cb) { _onDisconnect = std::move(cb); }
 
+	static std::string GetLocalIP();
+
 private:
 	uint16_t _port = 0;
 	bool _running = false;

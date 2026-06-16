@@ -89,3 +89,52 @@ void WebSocketServer::Broadcast(const std::string &text)
 		ws->sendText(text);
 	}
 }
+
+// NOTE: untested on Windows
+std::string WebSocketServer::GetLocalIP()
+{
+	std::array<char, 256> hostname;
+	if (gethostname(hostname.data(), hostname.size()) != 0)
+	{
+		return "127.0.0.1";
+	}
+
+	struct addrinfo hints = {};
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_ADDRCONFIG;
+
+	struct addrinfo *result = nullptr;
+	int err = getaddrinfo(hostname.data(), nullptr, &hints, &result);
+	if (err != 0 || !result)
+	{
+		return "127.0.0.1";
+	}
+
+	std::string ip = "127.0.0.1";
+	for (struct addrinfo *rp = result; rp != nullptr; rp = rp->ai_next)
+	{
+		if (rp->ai_family != AF_INET)
+		{
+			continue;
+		}
+
+		auto *sa = reinterpret_cast<sockaddr_in *>(rp->ai_addr);
+		uint32_t addr = ntohl(sa->sin_addr.s_addr);
+		// skip loopback
+		if ((addr & 0xFF000000) == 0x7F000000)
+		{
+			continue;
+		}
+
+		std::array<char, INET_ADDRSTRLEN> buf;
+		if (ix::inet_ntop(AF_INET, &sa->sin_addr, buf.data(), buf.size()))
+		{
+			ip = buf.data();
+			break;
+		}
+	}
+
+	freeaddrinfo(result);
+	return ip;
+}
