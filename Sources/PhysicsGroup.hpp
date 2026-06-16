@@ -29,6 +29,9 @@ public:
 
 	void CreatePhysicsBody();
 
+	void SetSourceIndex(size_t index) { _sourceIndex = index; }
+	size_t GetSourceIndex() const { return _sourceIndex; }
+
 	static void SetDefaultMass(float mass) { _defaultMass = mass; }
 	static float GetDefaultMass() { return _defaultMass; }
 
@@ -40,6 +43,7 @@ private:
 
 	RN::Array *_objects;
 	float _mass;
+	size_t _sourceIndex;
 
 	static float _defaultMass;
 };

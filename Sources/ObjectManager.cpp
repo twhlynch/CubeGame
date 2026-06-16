@@ -90,39 +90,32 @@ PhysicsGroup *ObjectManager::CreatePhysicsObjectWithIndex(size_t index)
 {
 	RN_DEBUG_ASSERT(index < GetColorCount() * GetShapeCount(), "Invalid object index");
 
-	if (index >= 0 && index < GetColorCount())
+	PhysicsObject *object = nullptr;
+
+	if (index < GetColorCount())
 	{
-		auto *object = new PhysicsCube(GetModelWithIndex(index));
-		return new PhysicsGroup(object);
+		object = new PhysicsCube(GetModelWithIndex(index));
+	}
+	else if (index < GetColorCount() * 2)
+	{
+		object = new PhysicsSphere(GetModelWithIndex(index));
+	}
+	else if (index < GetColorCount() * 3)
+	{
+		object = new PhysicsPyramid(GetModelWithIndex(index));
+	}
+	else if (index < GetColorCount() * 4)
+	{
+		object = new PhysicsRectangularPrism(GetModelWithIndex(index));
+	}
+	else
+	{
+		object = new PhysicsCylinder(GetModelWithIndex(index));
 	}
 
-	if (index >= GetColorCount() && index < GetColorCount() * 2)
-	{
-		auto *object = new PhysicsSphere(GetModelWithIndex(index));
-		return new PhysicsGroup(object);
-	}
-
-	if (index >= GetColorCount() * 2 && index < GetColorCount() * 3)
-	{
-		auto *object = new PhysicsPyramid(GetModelWithIndex(index));
-		return new PhysicsGroup(object);
-	}
-
-	if (index >= GetColorCount() * 3 && index < GetColorCount() * 4)
-	{
-		auto *object = new PhysicsRectangularPrism(GetModelWithIndex(index));
-		return new PhysicsGroup(object);
-	}
-
-	if (index >= GetColorCount() * 4 && index < GetColorCount() * 5)
-	{
-		auto *object = new PhysicsCylinder(GetModelWithIndex(index));
-		return new PhysicsGroup(object);
-	}
-
-	// and just in case
-	auto *object = new PhysicsCube(GetModelWithIndex(index));
-	return new PhysicsGroup(object);
+	auto *group = new PhysicsGroup(object);
+	group->SetSourceIndex(index);
+	return group;
 }
 
 RN::Mesh *ObjectManager::GetMeshWithIndex(size_t index)
