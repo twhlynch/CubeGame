@@ -14,8 +14,13 @@ public:
 
 	void Update(float delta) override;
 
+	void SetSourceIndex(size_t index) { _sourceIndex = index; }
+	size_t GetSourceIndex() const { return _sourceIndex; }
+
 private:
 	RNDeclareMeta(PhysicsObject);
+
+	size_t _sourceIndex = 0;
 };
 
 class PhysicsCube : public PhysicsObject

@@ -5,11 +5,12 @@
 #include <string>
 #include <unordered_map>
 
-#include "RNSceneNode.h"
 #include "WebSocketServer.hpp"
 
 namespace CG
 {
+
+class PhysicsObject;
 
 class LANServer
 {
@@ -26,7 +27,7 @@ public:
 	[[nodiscard]] std::string GetAddressString() const { return _address; }
 
 private:
-	struct GroupState
+	struct ObjectState
 	{
 		uint32_t id;
 		RN::Vector3 pos;
@@ -39,7 +40,7 @@ private:
 	float _broadcastTimer = 0.0f;
 
 	uint32_t _nextObjectId = 0;
-	std::unordered_map<const RN::SceneNode *, GroupState> _lastSent;
+	std::unordered_map<const PhysicsObject *, ObjectState> _lastSent;
 };
 
 } // namespace CG

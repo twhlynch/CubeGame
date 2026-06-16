@@ -12,7 +12,7 @@ static constexpr float friction = 0.5f;
 
 float PhysicsGroup::_defaultMass = 0.5f;
 
-PhysicsGroup::PhysicsGroup(PhysicsObject *object) : _mass(0), _body(nullptr), _sourceIndex(0)
+PhysicsGroup::PhysicsGroup(PhysicsObject *object) : _mass(0), _body(nullptr)
 {
 	_objects = new RN::Array();
 	_shape = new RN::JoltCompoundShape();

@@ -113,8 +113,8 @@ PhysicsGroup *ObjectManager::CreatePhysicsObjectWithIndex(size_t index)
 		object = new PhysicsCylinder(GetModelWithIndex(index));
 	}
 
+	object->SetSourceIndex(index);
 	auto *group = new PhysicsGroup(object);
-	group->SetSourceIndex(index);
 	return group;
 }
 
