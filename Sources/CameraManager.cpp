@@ -123,9 +123,14 @@ void CameraManager::UpdateForWindowSize() const
 		sourceRectangle.y = 0.0f;
 	}
 
-	_copyEyeToScreenMaterial->SetDiffuseColor(RN::Color(sourceRectangle.x / _vrWindow->GetSize().x,
-														sourceRectangle.y / _vrWindow->GetSize().y, (sourceRectangle.z / _vrWindow->GetSize().x),
-														(sourceRectangle.w / _vrWindow->GetSize().y)));
+	_copyEyeToScreenMaterial->SetDiffuseColor(
+		RN::Color(
+			sourceRectangle.x / _vrWindow->GetSize().x,
+			sourceRectangle.y / _vrWindow->GetSize().y,
+			sourceRectangle.z / _vrWindow->GetSize().x,
+			sourceRectangle.w / _vrWindow->GetSize().y
+		)
+	);
 }
 
 void CameraManager::SetPreviewWindowEnabled(bool enable)

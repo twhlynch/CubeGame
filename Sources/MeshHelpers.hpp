@@ -19,7 +19,8 @@ constexpr size_t segments = 12;
 template <typename V, typename I>
 static RN::Mesh *MeshBuilder(
 	const V &verticesData,
-	const I &indicesData)
+	const I &indicesData
+)
 {
 	auto *mesh = new RN::Mesh(
 		{
@@ -28,7 +29,9 @@ static RN::Mesh *MeshBuilder(
 			VertexAttribute(VertexAttribute::Feature::Color0, RN::PrimitiveType::Color),
 			VertexAttribute(VertexAttribute::Feature::Indices, RN::PrimitiveType::Uint16),
 		},
-		verticesData.size(), indicesData.size());
+		verticesData.size(),
+		indicesData.size()
+	);
 
 	mesh->BeginChanges();
 	auto chunk = mesh->GetChunk();
@@ -63,12 +66,14 @@ static RN::Mesh *MeshBuilder(
 
 static RN::Mesh *MeshBuilder(
 	const std::initializer_list<RN::Vector3> &verticesData,
-	const std::initializer_list<RN::uint16> &indicesData)
+	const std::initializer_list<RN::uint16> &indicesData
+)
 {
 	return MeshBuilder<
 		std::initializer_list<RN::Vector3>,
 		std::initializer_list<RN::uint16>>(
-		verticesData, indicesData);
+		verticesData, indicesData
+	);
 }
 
 // NOTE: box drawing symbols
@@ -279,7 +284,8 @@ template <typename V, typename I, typename N>
 static RN::Mesh *MeshBuilderWithNormals(
 	const V &verticesData,
 	const I &indicesData,
-	const N &normalsData)
+	const N &normalsData
+)
 {
 	auto *mesh = new RN::Mesh(
 		{
@@ -288,7 +294,9 @@ static RN::Mesh *MeshBuilderWithNormals(
 			VertexAttribute(VertexAttribute::Feature::Color0, RN::PrimitiveType::Color),
 			VertexAttribute(VertexAttribute::Feature::Indices, RN::PrimitiveType::Uint16),
 		},
-		verticesData.size(), indicesData.size());
+		verticesData.size(),
+		indicesData.size()
+	);
 
 	mesh->BeginChanges();
 	auto chunk = mesh->GetChunk();

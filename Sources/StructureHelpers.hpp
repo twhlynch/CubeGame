@@ -63,7 +63,7 @@ static void AddWall()
 	RN::Vector3 basePosition(0.0f, 0.0f, 1.0f);
 	RN::Vector3 right(1.0f, 0.0f, 0.0f);
 	RN::Vector3 forward(0.0f, 0.0f, 1.0f);
-	RN::Quaternion rotation{};
+	RN::Quaternion rotation {};
 
 	if (camera)
 	{

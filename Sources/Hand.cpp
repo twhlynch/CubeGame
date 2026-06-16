@@ -16,11 +16,11 @@
 namespace CG
 {
 
-bool Hand::_scaling{};
-float Hand::_initialHandDistance{};
-RN::Vector3 Hand::_initialObjectScale{};
-RN::Vector3 Hand::_initialGrabLocal0{};
-RN::Vector3 Hand::_initialGrabLocal1{};
+bool Hand::_scaling {};
+float Hand::_initialHandDistance {};
+RN::Vector3 Hand::_initialObjectScale {};
+RN::Vector3 Hand::_initialGrabLocal0 {};
+RN::Vector3 Hand::_initialGrabLocal1 {};
 
 Hand::Hand(uint8_t index)
 	: _handIndex(index), _hasStartedTracking(false),
@@ -332,7 +332,8 @@ void Hand::DropObject()
 		const RN::Quaternion rotation = _grabbedObject->GetWorldRotation();
 
 		auto *object = Physics::TestOverlap<PhysicsGroup>(
-			shape, position, rotation, Types::CollisionGrabbing, _grabbedObject);
+			shape, position, rotation, Types::CollisionGrabbing, _grabbedObject
+		);
 
 		if (object && object != _grabbedObject)
 		{
@@ -377,7 +378,8 @@ T *Hand::GetPinchOverlap(RN::uint32 mask)
 
 	// check for overlaps at the pinch position
 	auto object = Physics::TestOverlap<T>(
-		_intersectShape, pinch, RN::Quaternion(), mask);
+		_intersectShape, pinch, RN::Quaternion(), mask
+	);
 
 	return object;
 }

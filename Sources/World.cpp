@@ -141,8 +141,8 @@ void World::WillUpdate(float delta)
 
 	if (
 		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("L")) &&
-		_lanServer &&
-		!_lanServer->IsRunning())
+		_lanServer && !_lanServer->IsRunning()
+	)
 	{
 		StartLANServer();
 	}

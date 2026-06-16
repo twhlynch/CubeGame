@@ -20,11 +20,12 @@ bool WebSocketServer::Start(uint16_t port)
 	_server->setOnConnectionCallback(
 		[this](
 			const std::weak_ptr<ix::WebSocket> &ws,
-			const std::shared_ptr<ix::ConnectionState> &) {
+			const std::shared_ptr<ix::ConnectionState> &
+		) {
 			auto s = ws.lock();
 			if (!s) { return; }
 
-			static std::atomic<uint32_t> s_nextID{1};
+			static std::atomic<uint32_t> s_nextID {1};
 			uint32_t id = s_nextID.fetch_add(1);
 
 			s->setOnMessageCallback([this, id](const ix::WebSocketMessagePtr &msg) {
@@ -55,7 +56,8 @@ bool WebSocketServer::Start(uint16_t port)
 			});
 
 			s->start();
-		});
+		}
+	);
 
 	if (!_server->listenAndStart())
 	{

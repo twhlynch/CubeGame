@@ -51,10 +51,8 @@ void LANServer::Update(float delta)
 
 	std::array<char, 256> header;
 	int len = std::snprintf(
-		header.data(), header.size(),
-		R"({"p":[%.3f,%.3f,%.3f],"r":[%.3f,%.3f,%.3f,%.3f],"s":[)",
-		playerPos.x, playerPos.y, playerPos.z,
-		playerRot.x, playerRot.y, playerRot.z, playerRot.w);
+		header.data(), header.size(), R"({"p":[%.3f,%.3f,%.3f],"r":[%.3f,%.3f,%.3f,%.3f],"s":[)", playerPos.x, playerPos.y, playerPos.z, playerRot.x, playerRot.y, playerRot.z, playerRot.w
+	);
 	result.append(header.data(), static_cast<size_t>(len));
 
 	bool first = true;
@@ -82,18 +80,21 @@ void LANServer::Update(float delta)
 		if (it == _lastSent.end())
 		{
 			id = _nextObjectId++;
-			it = _lastSent.emplace(node, GroupState{.id = id, .pos = pos, .rot = rot, .scale = scale}).first;
+			it = _lastSent.emplace(node, GroupState {.id = id, .pos = pos, .rot = rot, .scale = scale}).first;
 			changed = true;
 		}
 		else
 		{
 			id = it->second.id;
-			changed = (pos - it->second.pos).GetLength() >= 0.001f ||
-					  std::abs(rot.x - it->second.rot.x) >= 0.001f ||
-					  std::abs(rot.y - it->second.rot.y) >= 0.001f ||
-					  std::abs(rot.z - it->second.rot.z) >= 0.001f ||
-					  std::abs(rot.w - it->second.rot.w) >= 0.001f ||
-					  std::abs(scale.x - it->second.scale.x) >= RN::k::EpsilonFloat;
+			changed =
+				std::abs(pos.x - it->second.pos.x) >= 0.001f ||
+				std::abs(pos.y - it->second.pos.y) >= 0.001f ||
+				std::abs(pos.z - it->second.pos.z) >= 0.001f ||
+				std::abs(rot.x - it->second.rot.x) >= 0.001f ||
+				std::abs(rot.y - it->second.rot.y) >= 0.001f ||
+				std::abs(rot.z - it->second.rot.z) >= 0.001f ||
+				std::abs(rot.w - it->second.rot.w) >= 0.001f ||
+				std::abs(scale.x - it->second.scale.x) >= RN::k::EpsilonFloat;
 		}
 
 		if (!first) { result += ','; }
@@ -104,12 +105,8 @@ void LANServer::Update(float delta)
 			{
 				std::array<char, 144> entry;
 				int len = std::snprintf(
-					entry.data(), entry.size(),
-					"[%u,%zu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f]",
-					id, sourceIndex,
-					pos.x, pos.y, pos.z,
-					rot.x, rot.y, rot.z, rot.w,
-					scale.x, scale.y, scale.z);
+					entry.data(), entry.size(), "[%u,%zu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f]", id, sourceIndex, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w, scale.x, scale.y, scale.z
+				);
 				result.append(entry.data(), static_cast<size_t>(len));
 			}
 

@@ -7,6 +7,8 @@ UseTab: Always
 ContinuationIndentWidth: 4
 ConstructorInitializerIndentWidth: 4
 
+BinPackArguments: false
+PenaltyBreakBeforeFirstCallParameter: 0
 AccessModifierOffset: -4
 IndentAccessModifiers: false
 NamespaceIndentation: None
@@ -36,11 +38,11 @@ AllowShortBlocksOnASingleLine: Always
 
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
-BreakTemplateDeclarations: MultiLine
+BreakTemplateDeclarations: Yes
 BreakBeforeConceptDeclarations: Always
 BreakBeforeTernaryOperators: true
 
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
 AlignOperands: Align
 AlignTrailingComments:
     Kind: Always
@@ -58,6 +60,10 @@ InsertBraces: true
 InsertNewlineAtEOF: true
 ReflowComments: true
 FixNamespaceComments: true
+
+SpacesInContainerLiterals: true
+SpaceBeforeCpp11BracedList: true
+Cpp11BracedListStyle: true
 
 SortIncludes: CaseSensitive
 IncludeBlocks: Regroup

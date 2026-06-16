@@ -243,14 +243,16 @@ void Menu::HandleButtonClick()
 	}
 	else if (
 		_wallButton->GetIsHighlighted() ||
-		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("1")))
+		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("1"))
+	)
 	{
 		Structures::AddWall();
 		Toggle();
 	}
 	else if (
 		_towersButton->GetIsHighlighted() ||
-		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("2")))
+		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("2"))
+	)
 	{
 		Structures::AddTowers();
 		Toggle();
@@ -263,8 +265,9 @@ void Menu::HandleButtonClick()
 	else if (_lanButton->GetIsHighlighted())
 	{
 		World *world = World::GetSharedInstance();
+		auto *lanServer = world->GetLANServer();
 
-		if (world->GetLANServer()->IsRunning())
+		if (lanServer && lanServer->IsRunning())
 		{
 			world->StopLANServer();
 			_lanButton->GetLabel()->SetText(RNCSTR("Open to LAN"));

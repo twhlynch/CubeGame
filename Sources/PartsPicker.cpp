@@ -31,7 +31,8 @@ PartsPicker::PartsPicker() : _objects(new RN::Array())
 			RN::Vector3 position(
 				0,
 				(static_cast<float>(j) * gap) + handOffset,
-				(static_cast<float>(i) * gap) - centerOffset);
+				(static_cast<float>(i) * gap) - centerOffset
+			);
 
 			const size_t index = (j * ObjectManager::GetColorCount()) + i;
 

@@ -16,7 +16,8 @@ T *TestOverlap(
 	const RN::Vector3 &position,
 	const RN::Quaternion &rotation,
 	RN::uint32 mask,
-	const RN::SceneNode *skip = nullptr)
+	const RN::SceneNode *skip = nullptr
+)
 {
 	static_assert(std::is_base_of_v<RN::SceneNode, T>);
 
@@ -24,7 +25,8 @@ T *TestOverlap(
 
 	// check for overlaps with test collision group
 	auto overlaps = world->GetPhysicsWorld()->CheckOverlap(
-		shape, position, rotation, 1.0f, Types::CollisionTest, mask);
+		shape, position, rotation, 1.0f, Types::CollisionTest, mask
+	);
 
 	// find an overlap derived from T
 	for (const auto &info : overlaps)
