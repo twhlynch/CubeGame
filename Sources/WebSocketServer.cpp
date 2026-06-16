@@ -1,5 +1,6 @@
 #include "WebSocketServer.hpp"
 
+#include <RayneConfig.h>
 #include <atomic>
 
 #include "ixwebsocket/IXNetSystem.h"
@@ -125,8 +126,8 @@ std::string WebSocketServer::GetLocalIP()
 		close(fd);
 	}
 
-	return ip;
-#else
+	if (ip != "127.0.0.1") { return ip; }
+#endif
 	// resolve local hostname
 	// then find non-loopback IPv4 address
 	// NOTE: untested on Windows
@@ -160,7 +161,6 @@ std::string WebSocketServer::GetLocalIP()
 	}
 
 	freeaddrinfo(result);
-#endif
 
 	return ip;
 }
