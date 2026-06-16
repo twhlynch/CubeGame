@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdio>
 
+#include "Hand.hpp"
 #include "PhysicsGroup.hpp"
 #include "PhysicsObjects.hpp"
 #include "RNConstants.h"
@@ -144,6 +145,33 @@ void LANServer::Update(float delta)
 			}
 		});
 	});
+
+	result += R"(],"h":[)";
+
+	for (size_t handIndex = 0; handIndex < 2; handIndex++)
+	{
+		if (handIndex > 0) { result += ','; }
+		result += '[';
+
+		Hand *hand = world->GetHand(handIndex);
+		if (hand)
+		{
+			const std::array<size_t, 5> tips = {Joint::ThumbTip, Joint::IndexTip, Joint::MiddleTip, Joint::RingTip, Joint::LittleTip};
+			for (size_t t = 0; t < tips.size(); t++)
+			{
+				if (t > 0) { result += ','; }
+				RN::Vector3 pos = hand->GetFingerTipPosition(tips[t]);
+				std::array<char, 64> buf;
+				int len = std::snprintf(buf.data(), buf.size(), "%.3f,%.3f,%.3f", pos.x, pos.y, pos.z);
+				if (len > 0)
+				{
+					result.append(buf.data(), std::min(static_cast<size_t>(len), buf.size() - 1));
+				}
+			}
+		}
+
+		result += ']';
+	}
 
 	result += "]}";
 
