@@ -26,6 +26,11 @@
 			"required": true
 		},
 		{
+			"type": "permission",
+			"name": "android.permission.INTERNET",
+			"required": true
+		},
+		{
 			"type": "feature",
 			"name": "oculus.software.handtracking",
 			"required": true
