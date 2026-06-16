@@ -21,6 +21,9 @@
 /Builds
 /Releases
 
+# website dist
+/Resources/Website
+
 # secrets
 /Other/build-secrets.json
 /keystore

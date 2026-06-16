@@ -83,6 +83,19 @@ file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/Sources/*.hpp"
 )
 
+set(WEBSITE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/Vendor/CubeGame-Website")
+set(WEBSITE_DST "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Website")
+add_custom_target(
+	BuildWebsite
+	ALL
+	COMMAND ${CMAKE_COMMAND} -E env CI=true npm ci
+	COMMAND npm run build
+	COMMAND
+		${CMAKE_COMMAND} -E copy_directory "${WEBSITE_SRC}/dist/" "${WEBSITE_DST}"
+	WORKING_DIRECTORY "${WEBSITE_SRC}"
+	COMMENT "Building LAN website"
+)
+
 set(RESOURCES manifest.json Resources)
 
 if(IOS OR VISIONOS)
@@ -114,6 +127,8 @@ elseif(IOS OR VISIONOS)
 else()
 	add_executable(${PROJECT_NAME} "${SOURCES}" "${HEADERS}")
 endif()
+
+add_dependencies(${PROJECT_NAME} BuildWebsite)
 
 target_include_directories(
 	${PROJECT_NAME}
