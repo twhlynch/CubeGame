@@ -36,7 +36,7 @@ void World::Exit()
 }
 
 World::World(RN::VRWindow *vrWindow)
-	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _wasTogglingMenu(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr)
+	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _wasTogglingMenu(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr), _lanServer(nullptr)
 {
 	_sharedInstance = this;
 
@@ -55,6 +55,7 @@ World::~World()
 
 	SafeRelease(_menu);
 
+	delete _lanServer;
 	delete _objectManager;
 }
 
@@ -74,6 +75,8 @@ void World::WillBecomeActive()
 	AddAttachment(_physicsWorld->Autorelease());
 
 	_objectManager = new ObjectManager();
+
+	_lanServer = new LANServer();
 
 	LoadLevel();
 }
@@ -134,6 +137,36 @@ void World::WillUpdate(float delta)
 			object->SetWorldPosition({0, 1.0f, 0});
 			AddLevelNode(object->Autorelease());
 		}
+	}
+
+	if (
+		RN::InputManager::GetSharedInstance()->IsControlToggling(RNCSTR("L")) &&
+		_lanServer &&
+		!_lanServer->IsRunning())
+	{
+		StartLANServer();
+	}
+
+	if (_lanServer)
+	{
+		_lanServer->Update(delta);
+	}
+}
+
+void World::StartLANServer()
+{
+	if (_lanServer && _lanServer->Start())
+	{
+		RNDebug("LAN server started on port " << _lanServer->GetPort());
+	}
+}
+
+void World::StopLANServer()
+{
+	if (_lanServer)
+	{
+		_lanServer->Stop();
+		RNDebug("LAN server stopped");
 	}
 }
 

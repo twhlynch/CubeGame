@@ -5,6 +5,7 @@
 
 #include "CameraManager.hpp"
 #include "Hand.hpp"
+#include "LANServer.hpp"
 #include "Menu.hpp"
 #include "ObjectManager.hpp"
 #include "Types.hpp"
@@ -44,6 +45,10 @@ public:
 	bool GetDebugMode() const { return _debugMode; }
 	void ToggleDebugMode() { _debugMode = !_debugMode; }
 
+	LANServer *GetLANServer() { return _lanServer; }
+	void StartLANServer();
+	void StopLANServer();
+
 	void LoadLevel();
 
 protected:
@@ -70,6 +75,7 @@ protected:
 
 	std::array<Hand *, 2> _hands;
 	Menu *_menu;
+	LANServer *_lanServer;
 
 	static World *_sharedInstance;
 };

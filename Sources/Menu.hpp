@@ -31,6 +31,9 @@ private:
 	RN::UI::Slider *_massSlider;
 	RN::UI::Label *_massLabel;
 
+	RN::UI::Button *_lanButton;
+	RN::UI::Label *_lanLabel;
+
 	bool _hidden;
 
 	RNDeclareMeta(Menu);

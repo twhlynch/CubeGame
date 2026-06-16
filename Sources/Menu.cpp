@@ -73,10 +73,25 @@ Menu::Menu()
 	_towersButton->SetCornerRadius(fontSize);
 	_towersButton->SetFrame(centered + RN::Rect(buttonWidth * 0.6f, buttonHeight * 2, 0, 0));
 
+	// lan server
+	_lanButton = new RN::UI::Button(RN::UI::TextAttributes(font, fontSize, RN::Color::White(), RN::UI::TextAlignmentCenter));
+	_lanButton->GetLabel()->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
+	_lanButton->GetLabel()->SetText(RNCSTR("Open to LAN"));
+	_lanButton->SetBackgroundColor(RN::Color(0.5f, 0.0f, 0.5f, 0.8f));
+	_lanButton->SetCornerRadius(fontSize);
+	_lanButton->SetFrame(centered + RN::Rect(0, buttonHeight * 6, 0, 0));
+
+	_lanLabel = new RN::UI::Label(RN::UI::TextAttributes(font, fontSize * 0.5f, RN::Color(0.5f, 0.5f, 0.5f, 0.6f), RN::UI::TextAlignmentCenter));
+	_lanLabel->SetVerticalAlignment(RN::UI::TextVerticalAlignmentCenter);
+	_lanLabel->SetText(RNCSTR(""));
+	_lanLabel->SetFrame(RN::Rect(0, (buttonHeight * 5.5) + fontSize, resolution, fontSize * 0.6f));
+
 	_window->AddSubview(_resetButton->Autorelease());
 	_window->AddSubview(_wallButton->Autorelease());
 	_window->AddSubview(_towersButton->Autorelease());
 	_window->AddSubview(_debugButton->Autorelease());
+	_window->AddSubview(_lanButton->Autorelease());
+	_window->AddSubview(_lanLabel->Autorelease());
 
 	// sliders
 	constexpr float sliderWidth = 190.0f;
@@ -155,6 +170,7 @@ void Menu::Update(float delta)
 	_wallButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
 	_towersButton->SetBackgroundColor(RN::Color(0.0f, 0.0f, 0.8f, 0.8f));
 	_debugButton->SetBackgroundColor(RN::Color(0.0f, 0.8f, 0.0f, 0.8f));
+	_lanButton->SetBackgroundColor(RN::Color(0.5f, 0.0f, 0.5f, 0.8f));
 
 	_resetButton->SetIsHighlighted(false);
 
@@ -203,6 +219,19 @@ void Menu::Update(float delta)
 
 	world->GetPhysicsWorld()->SetGravity(RN::Vector3(0.0f, -_gravitySlider->GetValue(), 0.0f));
 	PhysicsGroup::SetDefaultMass(_massSlider->GetValue());
+
+	// update lan label
+	auto *lanServer = world->GetLANServer();
+	if (lanServer->IsRunning())
+	{
+		const std::string &addr = lanServer->GetAddressString();
+		uint16_t port = lanServer->GetPort();
+		_lanLabel->SetText(RN::String::WithFormat("%s:%d", addr.c_str(), port));
+	}
+	else
+	{
+		_lanLabel->SetText(RNCSTR(""));
+	}
 }
 
 void Menu::HandleButtonClick()
@@ -229,6 +258,23 @@ void Menu::HandleButtonClick()
 	else if (_debugButton->GetIsHighlighted())
 	{
 		World::GetSharedInstance()->ToggleDebugMode();
+		Toggle();
+	}
+	else if (_lanButton->GetIsHighlighted())
+	{
+		World *world = World::GetSharedInstance();
+
+		if (world->GetLANServer()->IsRunning())
+		{
+			world->StopLANServer();
+			_lanButton->GetLabel()->SetText(RNCSTR("Open to LAN"));
+			_lanLabel->SetText(RNCSTR(""));
+		}
+		else
+		{
+			world->StartLANServer();
+			_lanButton->GetLabel()->SetText(RNCSTR("Close LAN"));
+		}
 		Toggle();
 	}
 }
