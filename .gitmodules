@@ -1,3 +1,6 @@
 [submodule "Vendor/IXWebSocket"]
 	path = Vendor/IXWebSocket
 	url = https://github.com/machinezone/IXWebSocket.git
+[submodule "Vendor/CubeGame-Website"]
+	path = Vendor/CubeGame-Website
+	url = https://github.com/twhlynch/CubeGame-Website.git
