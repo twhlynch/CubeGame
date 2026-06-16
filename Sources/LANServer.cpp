@@ -2,6 +2,7 @@
 
 #include <ixwebsocket/IXNetSystem.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdio>
@@ -53,7 +54,13 @@ void LANServer::Update(float delta)
 	int len = std::snprintf(
 		header.data(), header.size(), R"({"p":[%.3f,%.3f,%.3f],"r":[%.3f,%.3f,%.3f,%.3f],"s":[)", playerPos.x, playerPos.y, playerPos.z, playerRot.x, playerRot.y, playerRot.z, playerRot.w
 	);
-	result.append(header.data(), static_cast<size_t>(len));
+	if (len > 0)
+	{
+		result.append(
+			header.data(),
+			std::min(static_cast<size_t>(len), header.size() - 1)
+		);
+	}
 
 	bool first = true;
 
@@ -103,11 +110,17 @@ void LANServer::Update(float delta)
 		if (changed)
 		{
 			{
-				std::array<char, 144> entry;
+				std::array<char, 256> entry;
 				int len = std::snprintf(
 					entry.data(), entry.size(), "[%u,%zu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f]", id, sourceIndex, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w, scale.x, scale.y, scale.z
 				);
-				result.append(entry.data(), static_cast<size_t>(len));
+				if (len > 0)
+				{
+					result.append(
+						entry.data(),
+						std::min(static_cast<size_t>(len), entry.size() - 1)
+					);
+				}
 			}
 
 			it->second.pos = pos;
@@ -119,7 +132,13 @@ void LANServer::Update(float delta)
 			{
 				std::array<char, 16> entry;
 				int len = std::snprintf(entry.data(), entry.size(), "[%u]", id);
-				result.append(entry.data(), static_cast<size_t>(len));
+				if (len > 0)
+				{
+					result.append(
+						entry.data(),
+						std::min(static_cast<size_t>(len), entry.size() - 1)
+					);
+				}
 			}
 		}
 	});

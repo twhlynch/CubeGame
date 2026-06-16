@@ -54,8 +54,6 @@ bool WebSocketServer::Start(uint16_t port)
 						break;
 				}
 			});
-
-			s->start();
 		}
 	);
 
@@ -88,7 +86,10 @@ void WebSocketServer::Broadcast(const std::string &text)
 
 	for (const auto &ws : _server->getClients())
 	{
-		ws->sendText(text);
+		if (ws->getReadyState() == ix::ReadyState::Open)
+		{
+			ws->sendText(text);
+		}
 	}
 }
 
