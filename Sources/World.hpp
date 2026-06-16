@@ -46,6 +46,7 @@ public:
 	void ToggleDebugMode() { _debugMode = !_debugMode; }
 
 	LANServer *GetLANServer() { return _lanServer; }
+	RN::Array *GetLevelNodes() { return _levelNodes; }
 	void StartLANServer();
 	void StopLANServer();
 
