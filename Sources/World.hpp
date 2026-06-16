@@ -4,6 +4,7 @@
 #include <Rayne.h>
 
 #include "CameraManager.hpp"
+#include "HTTPServer.hpp"
 #include "Hand.hpp"
 #include "LANServer.hpp"
 #include "Menu.hpp"
@@ -46,6 +47,7 @@ public:
 	void ToggleDebugMode() { _debugMode = !_debugMode; }
 
 	LANServer *GetLANServer() { return _lanServer; }
+	HTTPServer *GetHTTPServer() { return _httpServer; }
 	RN::Array *GetLevelNodes() { return _levelNodes; }
 	void StartLANServer();
 	void StopLANServer();
@@ -77,6 +79,7 @@ protected:
 	std::array<Hand *, 2> _hands;
 	Menu *_menu;
 	LANServer *_lanServer;
+	HTTPServer *_httpServer;
 
 	static World *_sharedInstance;
 };

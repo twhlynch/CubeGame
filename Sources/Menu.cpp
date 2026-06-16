@@ -222,10 +222,11 @@ void Menu::Update(float delta)
 
 	// update lan label
 	auto *lanServer = world->GetLANServer();
+	auto *httpServer = world->GetHTTPServer();
 	if (lanServer->IsRunning())
 	{
 		const std::string &addr = lanServer->GetAddressString();
-		uint16_t port = lanServer->GetPort();
+		uint16_t port = httpServer ? httpServer->GetPort() : 80;
 		_lanLabel->SetText(RN::String::WithFormat("%s:%d", addr.c_str(), port));
 	}
 	else

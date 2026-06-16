@@ -1,5 +1,6 @@
 #include "World.hpp"
 
+#include <RNFileManager.h>
 #include <RNUI.h>
 
 #include "HandTrackingInfo.hpp"
@@ -36,7 +37,7 @@ void World::Exit()
 }
 
 World::World(RN::VRWindow *vrWindow)
-	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _wasTogglingMenu(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr), _lanServer(nullptr)
+	: _objectManager(nullptr), _vrWindow(nullptr), _physicsWorld(nullptr), _isPaused(false), _isDash(false), _wasTogglingMenu(false), _shaderLibrary(nullptr), _hands({nullptr, nullptr}), _menu(nullptr), _lanServer(nullptr), _httpServer(nullptr)
 {
 	_sharedInstance = this;
 
@@ -55,6 +56,7 @@ World::~World()
 
 	SafeRelease(_menu);
 
+	delete _httpServer;
 	delete _lanServer;
 	delete _objectManager;
 }
@@ -77,6 +79,7 @@ void World::WillBecomeActive()
 	_objectManager = new ObjectManager();
 
 	_lanServer = new LANServer();
+	_httpServer = new HTTPServer();
 
 	LoadLevel();
 }
@@ -159,6 +162,15 @@ void World::StartLANServer()
 	{
 		RNDebug("LAN server started on port " << _lanServer->GetPort());
 	}
+
+	if (_httpServer && !_httpServer->IsRunning())
+	{
+		RN::String *websitePath = RN::FileManager::GetSharedInstance()->ResolveFullPath(RNCSTR("Website/"), 0);
+		if (websitePath && _httpServer->Start(80, std::string(websitePath->GetUTF8String())))
+		{
+			RNDebug("HTTP server started on port 80 serving " << websitePath);
+		}
+	}
 }
 
 void World::StopLANServer()
@@ -167,6 +179,12 @@ void World::StopLANServer()
 	{
 		_lanServer->Stop();
 		RNDebug("LAN server stopped");
+	}
+
+	if (_httpServer)
+	{
+		_httpServer->Stop();
+		RNDebug("HTTP server stopped");
 	}
 }
 
