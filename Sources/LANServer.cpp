@@ -16,6 +16,11 @@ namespace CG
 
 bool LANServer::Start()
 {
+	_server.SetOnConnect([this](uint32_t) {
+		_lastSent.clear();
+		_broadcastTimer = 1.0f / 15.0f;
+	});
+
 	if (!_server.Start(8080)) { return false; }
 
 	_address = WebSocketServer::GetLocalIP();
