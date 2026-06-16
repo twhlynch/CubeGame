@@ -93,14 +93,46 @@ void WebSocketServer::Broadcast(const std::string &text)
 	}
 }
 
-// NOTE: untested on Windows
 std::string WebSocketServer::GetLocalIP()
 {
-	std::array<char, 256> hostname;
-	if (gethostname(hostname.data(), hostname.size()) != 0)
+	std::string ip = "127.0.0.1";
+
+	// UDP socket trick
+	// connect to 8.8.8.8:53 then read its IP with getsockname
+#if RN_PLATFORM_ANDROID
+
+	int fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd >= 0)
 	{
-		return "127.0.0.1";
+		struct sockaddr_in addr = {};
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(53);
+		inet_pton(AF_INET, "8.8.8.8", &addr.sin_addr);
+
+		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == 0)
+		{
+			struct sockaddr_in local = {};
+			socklen_t len = sizeof(local);
+			if (getsockname(fd, (struct sockaddr *)&local, &len) == 0)
+			{
+				std::array<char, INET_ADDRSTRLEN> buf;
+				if (ix::inet_ntop(AF_INET, &local.sin_addr, buf.data(), buf.size()))
+				{
+					ip = buf.data();
+				}
+			}
+		}
+		close(fd);
 	}
+
+	return ip;
+#else
+	// resolve local hostname
+	// then find non-loopback IPv4 address
+	// NOTE: untested on Windows
+
+	std::array<char, 256> hostname;
+	if (gethostname(hostname.data(), hostname.size()) != 0) { return ip; }
 
 	struct addrinfo hints = {};
 	hints.ai_family = AF_INET;
@@ -109,26 +141,15 @@ std::string WebSocketServer::GetLocalIP()
 
 	struct addrinfo *result = nullptr;
 	int err = getaddrinfo(hostname.data(), nullptr, &hints, &result);
-	if (err != 0 || !result)
-	{
-		return "127.0.0.1";
-	}
+	if (err != 0 || !result) { return ip; }
 
-	std::string ip = "127.0.0.1";
 	for (struct addrinfo *rp = result; rp != nullptr; rp = rp->ai_next)
 	{
-		if (rp->ai_family != AF_INET)
-		{
-			continue;
-		}
+		if (rp->ai_family != AF_INET) { continue; }
 
 		auto *sa = reinterpret_cast<sockaddr_in *>(rp->ai_addr);
 		uint32_t addr = ntohl(sa->sin_addr.s_addr);
-		// skip loopback
-		if ((addr & 0xFF000000) == 0x7F000000)
-		{
-			continue;
-		}
+		if ((addr & 0xFF000000) == 0x7F000000) { continue; }
 
 		std::array<char, INET_ADDRSTRLEN> buf;
 		if (ix::inet_ntop(AF_INET, &sa->sin_addr, buf.data(), buf.size()))
@@ -139,5 +160,7 @@ std::string WebSocketServer::GetLocalIP()
 	}
 
 	freeaddrinfo(result);
+#endif
+
 	return ip;
 }
