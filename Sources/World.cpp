@@ -166,9 +166,9 @@ void World::StartLANServer()
 	if (_httpServer && !_httpServer->IsRunning())
 	{
 		RN::String *websitePath = RN::FileManager::GetSharedInstance()->ResolveFullPath(RNCSTR("Website/"), 0);
-		if (websitePath && _httpServer->Start(80, std::string(websitePath->GetUTF8String())))
+		if (websitePath && _httpServer->Start(8080, std::string(websitePath->GetUTF8String())))
 		{
-			RNDebug("HTTP server started on port 80 serving " << websitePath);
+			RNDebug("HTTP server started on port 8080 serving " << websitePath);
 		}
 	}
 }

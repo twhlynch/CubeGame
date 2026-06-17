@@ -23,7 +23,7 @@ bool LANServer::Start()
 		_broadcastTimer = 1.0f / 15.0f;
 	});
 
-	if (!_server.Start(8080)) { return false; }
+	if (!_server.Start(8081)) { return false; }
 
 	_address = WebSocketServer::GetLocalIP();
 	return true;
