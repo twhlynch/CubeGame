@@ -90,6 +90,7 @@ add_custom_target(
 	ALL
 	COMMAND ${CMAKE_COMMAND} -E env CI=true npm ci
 	COMMAND npm run build
+	COMMAND ${CMAKE_COMMAND} -E rm -rf "${WEBSITE_DST}"
 	COMMAND
 		${CMAKE_COMMAND} -E copy_directory "${WEBSITE_SRC}/dist/" "${WEBSITE_DST}"
 	WORKING_DIRECTORY "${WEBSITE_SRC}"
