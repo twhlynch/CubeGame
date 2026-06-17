@@ -1,9 +1,5 @@
 # Planned features
 
-### Object properties
-
-Objects should have differing properties based on color. This is like mass, friction, restitution, gravity, etc.
-
 ### Discoverable achievements
 
 Would be a hidden list of random things that you can do, such as stack 10 objects, throw some distance, juggle, etc.

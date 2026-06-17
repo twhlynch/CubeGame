@@ -39,7 +39,11 @@ private:
 	RN::JoltDynamicBody *_body;
 
 	RN::Array *_objects;
+
 	float _mass;
+	float _friction;
+	float _restitution;
+	float _gravity;
 
 	static float _defaultMass;
 };

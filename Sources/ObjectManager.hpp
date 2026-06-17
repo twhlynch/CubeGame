@@ -10,6 +10,14 @@
 namespace CG
 {
 
+struct ColorProperties
+{
+	float mass;
+	float friction;
+	float restitution;
+	float gravity;
+};
+
 constexpr size_t shapeCount = 5;
 
 class ObjectManager
@@ -27,6 +35,7 @@ public:
 
 	static constexpr size_t GetShapeCount() { return shapeCount; }
 	static constexpr size_t GetColorCount() { return 9; }
+	static const ColorProperties &GetColorProperties(size_t colorIndex);
 
 private:
 	RN::Array *_models;

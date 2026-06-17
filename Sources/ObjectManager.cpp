@@ -11,6 +11,25 @@
 namespace CG
 {
 
+static constexpr size_t ColorCount = 9;
+
+static const ColorProperties ColorPropertiesLookup[ColorCount] = {
+	{.mass = 1.0f, .friction = 0.50f, .restitution = 0.10f, .gravity = 1.0f}, // 0 Red    Normal
+	{.mass = 1.0f, .friction = 0.50f, .restitution = 0.10f, .gravity = 1.0f}, // 1 Green  Normal
+	{.mass = 1.0f, .friction = 0.05f, .restitution = 0.10f, .gravity = 1.0f}, // 2 Blue   Ice
+	{.mass = 0.2f, .friction = 0.50f, .restitution = 0.20f, .gravity = 1.0f}, // 3 Yellow Light
+	{.mass = 1.0f, .friction = 0.95f, .restitution = 0.00f, .gravity = 1.0f}, // 4 Orange Grip
+	{.mass = 1.0f, .friction = 0.50f, .restitution = 0.85f, .gravity = 1.0f}, // 5 Purple Bouncy
+	{.mass = 1.0f, .friction = 0.50f, .restitution = 0.10f, .gravity = 1.0f}, // 6 White  Normal
+	{.mass = 4.0f, .friction = 0.70f, .restitution = 0.10f, .gravity = 1.0f}, // 7 Grey   Heavy
+	{.mass = 1.0f, .friction = 0.50f, .restitution = 0.10f, .gravity = 0.2f}, // 8 Black  Floaty
+};
+
+const ColorProperties &ObjectManager::GetColorProperties(size_t colorIndex)
+{
+	return ColorPropertiesLookup[colorIndex];
+}
+
 ObjectManager::ObjectManager()
 	: _models(new RN::Array())
 {

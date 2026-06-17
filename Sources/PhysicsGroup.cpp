@@ -2,17 +2,16 @@
 
 #include <Math/RNVector.h>
 
+#include "ObjectManager.hpp"
 #include "PhysicsObjects.hpp"
 #include "Types.hpp"
 
 namespace CG
 {
 
-static constexpr float friction = 0.5f;
-
 float PhysicsGroup::_defaultMass = 0.5f;
 
-PhysicsGroup::PhysicsGroup(PhysicsObject *object) : _mass(0), _body(nullptr)
+PhysicsGroup::PhysicsGroup(PhysicsObject *object) : _mass(0), _body(nullptr), _friction(0.0f), _restitution(0.0f), _gravity(0.0f)
 {
 	_objects = new RN::Array();
 	_shape = new RN::JoltCompoundShape();
@@ -54,10 +53,16 @@ void PhysicsGroup::AddObject(PhysicsObject *object)
 	const RN::Quaternion localRot = invRot * worldRot;
 	const RN::Vector3 localSca = worldSca / parentSca;
 
+	const ColorProperties &props = ObjectManager::GetColorProperties(object->GetSourceIndex() % ObjectManager::GetColorCount());
+
 	_objects->AddObject(object);
 	_shape->AddChild(object->CreateShape(), localPos, localRot);
 
-	_mass += _defaultMass;
+	_mass += _defaultMass * props.mass;
+	_friction += props.friction;
+	_restitution += props.restitution;
+	_gravity += props.gravity;
+
 	if (_body) { _body->SetMass(_mass); }
 
 	object->RemoveFromParent();
@@ -109,7 +114,11 @@ void PhysicsGroup::CreatePhysicsBody()
 	_body->SetAllowSleeping(false);
 	_body->SetEnableSleeping(false);
 	_body->SetEnableGravity(true);
-	_body->SetFriction(friction);
+
+	size_t count = _objects->GetCount();
+	_body->SetFriction(_friction / static_cast<float>(count));
+	_body->SetRestitution(_restitution / static_cast<float>(count));
+	_body->SetGravityFactor(_gravity / static_cast<float>(count));
 }
 
 void PhysicsGroup::StartManipulating()
@@ -139,6 +148,10 @@ void PhysicsGroup::Throw(RN::Vector3 linearVelocity, RN::Vector3 angularVelocity
 	// enable physics
 	_body->SetEnableKinematic(false);
 	_body->SetEnableGravity(true);
+
+	// reapply gravity factor (SetEnableGravity resets it)
+	float avgGravity = _gravity / static_cast<float>(_objects->GetCount());
+	_body->SetGravityFactor(avgGravity);
 
 	// move with velocity
 	_body->SetLinearVelocity(linearVelocity);
