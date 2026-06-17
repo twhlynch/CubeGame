@@ -1,7 +1,8 @@
 #include "HTTPServer.hpp"
 
-#include <fstream>
-#include <sstream>
+#include <RNData.h>
+#include <RNFile.h>
+#include <RNString.h>
 
 #include "ixwebsocket/IXHttpServer.h"
 #include "ixwebsocket/IXNetSystem.h"
@@ -20,19 +21,30 @@ bool HTTPServer::Start(uint16_t port, const std::string &rootDirectory)
 			std::string uri = request->uri;
 			if (uri.empty() || uri == "/") { uri = "/index.html"; }
 
-			std::string path = rootDirectory + uri;
+			std::string vfsPath = rootDirectory + uri;
+			RN::String *rnPath = RN::String::WithString(vfsPath.c_str());
 
-			std::ifstream file(path, std::ios::binary);
-			if (!file.is_open())
+			RN::File *file = nullptr;
+			try
+			{
+				file = RN::File::WithName(rnPath, RN::File::Mode::Read);
+			}
+			catch (const RN::FileNotFoundException &)
 			{
 				return std::make_shared<ix::HttpResponse>(
 					404, "Not Found", ix::HttpErrorCode::Ok, ix::WebSocketHttpHeaders(), std::string()
 				);
 			}
 
-			std::stringstream buffer;
-			buffer << file.rdbuf();
-			std::string content = buffer.str();
+			RN::Data *data = file->ReadData(file->GetSize());
+			if (!data)
+			{
+				return std::make_shared<ix::HttpResponse>(
+					404, "Not Found", ix::HttpErrorCode::Ok, ix::WebSocketHttpHeaders(), std::string()
+				);
+			}
+
+			std::string content(reinterpret_cast<const char *>(data->GetBytes()), data->GetLength());
 
 			ix::WebSocketHttpHeaders headers;
 			headers["Server"] = "CubeGame";
