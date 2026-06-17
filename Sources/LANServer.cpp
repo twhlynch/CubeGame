@@ -2,10 +2,7 @@
 
 #include <ixwebsocket/IXNetSystem.h>
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <cstdio>
+#include <Rayne.h>
 
 #include "Hand.hpp"
 #include "PhysicsGroup.hpp"
@@ -48,35 +45,47 @@ void LANServer::Update(float delta)
 	if (_broadcastTimer < 1.0f / 15.0f) { return; }
 	_broadcastTimer = 0.0f;
 
-	RN::Camera *camera = world->GetHeadCamera();
-	if (!camera) { return; }
+	auto *jsonString = SerializeScene();
+	if (jsonString)
+	{
+		_server.Broadcast(jsonString->GetUTF8String());
+	}
+}
 
+RN::String *LANServer::SerializeScene()
+{
+	World *world = World::GetSharedInstance();
+
+	RN::Camera *camera = world->GetHeadCamera();
+	if (!camera) { return nullptr; }
+
+	auto *root = new RN::Dictionary();
+
+	// player
 	RN::Vector3 playerPos = camera->GetWorldPosition();
 	RN::Quaternion playerRot = camera->GetWorldRotation();
 
-	std::string result;
-	result.reserve(32768);
+	auto *pos = new RN::Array();
+	pos->AddObject(RN::Number::WithFloat(playerPos.x));
+	pos->AddObject(RN::Number::WithFloat(playerPos.y));
+	pos->AddObject(RN::Number::WithFloat(playerPos.z));
+	root->SetValueForKey(pos->Autorelease(), "p");
 
-	std::array<char, 256> header;
-	int len = std::snprintf(
-		header.data(), header.size(), R"({"p":[%.3f,%.3f,%.3f],"r":[%.3f,%.3f,%.3f,%.3f],"s":[)", playerPos.x, playerPos.y, playerPos.z, playerRot.x, playerRot.y, playerRot.z, playerRot.w
-	);
-	if (len > 0)
-	{
-		result.append(
-			header.data(),
-			std::min(static_cast<size_t>(len), header.size() - 1)
-		);
-	}
+	auto *rot = new RN::Array();
+	rot->AddObject(RN::Number::WithFloat(playerRot.x));
+	rot->AddObject(RN::Number::WithFloat(playerRot.y));
+	rot->AddObject(RN::Number::WithFloat(playerRot.z));
+	rot->AddObject(RN::Number::WithFloat(playerRot.w));
+	root->SetValueForKey(rot->Autorelease(), "r");
 
-	bool first = true;
+	// shapes
+	auto *objects = new RN::Array();
 
 	world->GetLevelNodes()->Enumerate<RN::SceneNode>([&](RN::SceneNode *node, size_t, bool &) {
 		auto *group = dynamic_cast<PhysicsGroup *>(node);
 		if (!group) { return; }
 
-		auto *objects = group->GetObjects();
-		objects->Enumerate<PhysicsObject>([&](PhysicsObject *obj, size_t, bool &) {
+		group->GetObjects()->Enumerate<PhysicsObject>([&](PhysicsObject *obj, size_t, bool &) {
 			RN::Vector3 pos = obj->GetWorldPosition();
 			RN::Quaternion rot = obj->GetWorldRotation();
 			RN::Vector3 scale = obj->GetWorldScale();
@@ -106,76 +115,62 @@ void LANServer::Update(float delta)
 					std::abs(scale.x - it->second.scale.x) >= RN::k::EpsilonFloat;
 			}
 
-			if (!first) { result += ','; }
-			first = false;
+			auto *entry = new RN::Array();
+			entry->AddObject(RN::Number::WithUint32(id));
 
 			if (changed)
 			{
-				{
-					std::array<char, 256> entry;
-					int len = std::snprintf(
-						entry.data(), entry.size(), "[%u,%zu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f]", id, sourceIndex, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w, scale.x, scale.y, scale.z
-					);
-					if (len > 0)
-					{
-						result.append(
-							entry.data(),
-							std::min(static_cast<size_t>(len), entry.size() - 1)
-						);
-					}
-				}
+				entry->AddObject(RN::Number::WithUint64(sourceIndex));
+				entry->AddObject(RN::Number::WithFloat(pos.x));
+				entry->AddObject(RN::Number::WithFloat(pos.y));
+				entry->AddObject(RN::Number::WithFloat(pos.z));
+				entry->AddObject(RN::Number::WithFloat(rot.x));
+				entry->AddObject(RN::Number::WithFloat(rot.y));
+				entry->AddObject(RN::Number::WithFloat(rot.z));
+				entry->AddObject(RN::Number::WithFloat(rot.w));
+				entry->AddObject(RN::Number::WithFloat(scale.x));
+				entry->AddObject(RN::Number::WithFloat(scale.y));
+				entry->AddObject(RN::Number::WithFloat(scale.z));
 
 				it->second.pos = pos;
 				it->second.rot = rot;
 				it->second.scale = scale;
 			}
-			else
-			{
-				{
-					std::array<char, 16> entry;
-					int len = std::snprintf(entry.data(), entry.size(), "[%u]", id);
-					if (len > 0)
-					{
-						result.append(
-							entry.data(),
-							std::min(static_cast<size_t>(len), entry.size() - 1)
-						);
-					}
-				}
-			}
+
+			objects->AddObject(entry->Autorelease());
 		});
 	});
 
-	result += R"(],"h":[)";
+	root->SetValueForKey(objects->Autorelease(), "s");
+
+	// hands
+	auto *hands = new RN::Array();
 
 	for (size_t handIndex = 0; handIndex < 2; handIndex++)
 	{
-		if (handIndex > 0) { result += ','; }
-		result += '[';
+		auto *handArray = new RN::Array();
 
 		Hand *hand = world->GetHand(handIndex);
 		if (hand)
 		{
-			const std::array<size_t, 5> tips = {Joint::ThumbTip, Joint::IndexTip, Joint::MiddleTip, Joint::RingTip, Joint::LittleTip};
-			for (size_t t = 0; t < tips.size(); t++)
+			const std::array<size_t, 5> tips = {
+				Joint::ThumbTip, Joint::IndexTip, Joint::MiddleTip, Joint::RingTip, Joint::LittleTip
+			};
+			for (auto tip : tips)
 			{
-				if (t > 0) { result += ','; }
-				RN::Vector3 pos = hand->GetFingerTipPosition(tips[t]);
-				std::array<char, 64> buf;
-				int len = std::snprintf(buf.data(), buf.size(), "%.3f,%.3f,%.3f", pos.x, pos.y, pos.z);
-				if (len > 0)
-				{
-					result.append(buf.data(), std::min(static_cast<size_t>(len), buf.size() - 1));
-				}
+				RN::Vector3 tipPos = hand->GetFingerTipPosition(tip);
+				handArray->AddObject(RN::Number::WithFloat(tipPos.x));
+				handArray->AddObject(RN::Number::WithFloat(tipPos.y));
+				handArray->AddObject(RN::Number::WithFloat(tipPos.z));
 			}
 		}
 
-		result += ']';
+		hands->AddObject(handArray->Autorelease());
 	}
 
-	result += "]}";
+	root->SetValueForKey(hands->Autorelease(), "h");
 
-	_server.Broadcast(result);
+	return RN::JSONSerialization::JSONStringFromObject(root->Autorelease());
 }
 
 } // namespace CG

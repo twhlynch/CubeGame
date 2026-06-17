@@ -27,6 +27,8 @@ public:
 	[[nodiscard]] std::string GetAddressString() const { return _address; }
 
 private:
+	RN::String *SerializeScene();
+
 	struct ObjectState
 	{
 		uint32_t id;
