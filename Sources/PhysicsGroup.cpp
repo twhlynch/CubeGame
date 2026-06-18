@@ -5,6 +5,7 @@
 #include "ObjectManager.hpp"
 #include "PhysicsObjects.hpp"
 #include "Types.hpp"
+#include "World.hpp"
 
 namespace CG
 {
@@ -25,6 +26,19 @@ PhysicsGroup::~PhysicsGroup()
 {
 	_objects->Release();
 	_shape->Release();
+}
+
+void PhysicsGroup::Update(float delta)
+{
+	RN::SceneNode::Update(delta);
+
+	constexpr float voidHeight = -10.0f;
+
+	const RN::Vector3 worldPosition = GetWorldPosition();
+	if (worldPosition.y < voidHeight)
+	{
+		World::GetSharedInstance()->RemoveLevelNode(this);
+	}
 }
 
 void PhysicsGroup::UpdateCollisionFilter(bool grabbing)

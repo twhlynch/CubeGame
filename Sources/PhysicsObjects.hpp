@@ -12,8 +12,6 @@ public:
 	PhysicsObject(RN::Model *model);
 	virtual RN::JoltShape *CreateShape() const = 0;
 
-	void Update(float delta) override;
-
 	void SetSourceIndex(size_t index) { _sourceIndex = index; }
 	size_t GetSourceIndex() const { return _sourceIndex; }
 

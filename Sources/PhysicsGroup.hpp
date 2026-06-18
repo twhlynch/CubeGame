@@ -24,6 +24,8 @@ public:
 	void StartManipulating();
 	void StopManipulating();
 
+	void Update(float delta) override;
+
 	void Throw(RN::Vector3 linearVelocity, RN::Vector3 angularVelocity);
 	void Grab();
 
