@@ -4,12 +4,12 @@
 #include <Rayne.h>
 
 #include "CameraManager.hpp"
-#include "HTTPServer.hpp"
 #include "Hand.hpp"
-#include "LANServer.hpp"
 #include "Menu.hpp"
 #include "ObjectManager.hpp"
 #include "Types.hpp"
+#include "networking/HTTPServer.hpp"
+#include "networking/LANServer.hpp"
 
 namespace CG
 {

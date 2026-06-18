@@ -1,11 +1,14 @@
 #pragma once
 
+#include <ixwebsocket/IXWebSocketServer.h>
+
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 
-#include "ixwebsocket/IXWebSocketServer.h"
+namespace CG
+{
 
 class WebSocketServer
 {
@@ -42,3 +45,5 @@ private:
 	EventCallback _onConnect;
 	EventCallback _onDisconnect;
 };
+
+} // namespace CG

@@ -6,6 +6,9 @@
 
 #include "ixwebsocket/IXHttpServer.h"
 
+namespace CG
+{
+
 class HTTPServer
 {
 public:
@@ -26,3 +29,5 @@ private:
 	bool _running = false;
 	std::unique_ptr<ix::HttpServer> _server;
 };
+
+} // namespace CG

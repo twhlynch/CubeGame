@@ -6,6 +6,9 @@
 #include "ixwebsocket/IXNetSystem.h"
 #include "ixwebsocket/IXWebSocket.h"
 
+namespace CG
+{
+
 bool WebSocketServer::Start(uint16_t port)
 {
 	if (_running)
@@ -164,3 +167,5 @@ std::string WebSocketServer::GetLocalIP()
 
 	return ip;
 }
+
+} // namespace CG

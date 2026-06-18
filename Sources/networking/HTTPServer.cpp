@@ -1,11 +1,14 @@
 #include "HTTPServer.hpp"
 
+#include <ixwebsocket/IXHttpServer.h>
+#include <ixwebsocket/IXNetSystem.h>
+
 #include <RNData.h>
 #include <RNFile.h>
 #include <RNString.h>
 
-#include "ixwebsocket/IXHttpServer.h"
-#include "ixwebsocket/IXNetSystem.h"
+namespace CG
+{
 
 bool HTTPServer::Start(uint16_t port, const std::string &rootDirectory)
 {
@@ -91,3 +94,5 @@ const char *HTTPServer::GetMimeType(const std::string &path)
 	if (ext == ".png") { return "image/png"; }
 	return "application/octet-stream";
 }
+
+} // namespace CG
