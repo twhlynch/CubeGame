@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-APK_FILE="Builds/android_oculus/app/release/app-release.apk"
+APK_FILE="Builds/android_oculus/Releases/app-release.apk"
 SECRETS_FILE="Other/build-secrets.json"
 
 function err() {

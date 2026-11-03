@@ -21,8 +21,8 @@ cd "$BUILD_DIR"
 ./gradlew assembleRelease
 cd ../../
 
-OUTPUT="$BUILD_DIR/app/release/app-release.apk"
-mkdir -p "$BUILD_DIR/app/release/"
+OUTPUT="$BUILD_DIR/Releases/app-release.apk"
+mkdir -p "$BUILD_DIR/Releases/"
 
 # sign
 apksigner sign \
