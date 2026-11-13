@@ -32,6 +32,21 @@ void PhysicsGroup::Update(float delta)
 {
 	RN::SceneNode::Update(delta);
 
+	// manually apply ajusted gravity as an acceleration force each frame
+	if (_body)
+	{
+		const size_t count = _objects->GetCount();
+		if (count > 0)
+		{
+			const float gravityFactor = _gravity / static_cast<float>(count);
+			if (gravityFactor != 0.0f)
+			{
+				const RN::Vector3 gravity = _body->GetJoltWorld()->GetGravity();
+				_body->ApplyAcceleration(gravity * gravityFactor);
+			}
+		}
+	}
+
 	constexpr float voidHeight = -10.0f;
 
 	const RN::Vector3 worldPosition = GetWorldPosition();
@@ -127,12 +142,11 @@ void PhysicsGroup::CreatePhysicsBody()
 
 	_body->SetAllowSleeping(false);
 	_body->SetEnableSleeping(false);
-	_body->SetEnableGravity(true);
+	_body->SetEnableGravity(false);
 
 	size_t count = _objects->GetCount();
 	_body->SetFriction(_friction / static_cast<float>(count));
 	_body->SetRestitution(_restitution / static_cast<float>(count));
-	_body->SetGravityFactor(_gravity / static_cast<float>(count));
 }
 
 void PhysicsGroup::StartManipulating()
@@ -161,11 +175,6 @@ void PhysicsGroup::Throw(RN::Vector3 linearVelocity, RN::Vector3 angularVelocity
 
 	// enable physics
 	_body->SetEnableKinematic(false);
-	_body->SetEnableGravity(true);
-
-	// reapply gravity factor (SetEnableGravity resets it)
-	float avgGravity = _gravity / static_cast<float>(_objects->GetCount());
-	_body->SetGravityFactor(avgGravity);
 
 	// move with velocity
 	_body->SetLinearVelocity(linearVelocity);
